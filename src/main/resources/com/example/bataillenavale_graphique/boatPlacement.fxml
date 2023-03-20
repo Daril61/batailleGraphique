@@ -16,27 +16,27 @@
    <children>
       <HBox prefHeight="100.0" prefWidth="200.0" spacing="80.0">
          <children>
-            <ImageView fx:id="porteAvion" fitHeight="200.0" fitWidth="74.0" onDragDetected="#OnBoatDragStart" onDragDropped="#OnBoatDragStop" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="porteAvion" fitHeight="200.0" fitWidth="74.0" onDragDetected="#OnBoatStartDrag" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../Images/PorteAvions.png" />
                </image>
             </ImageView>
-            <ImageView fx:id="croiseur" fitHeight="160.0" fitWidth="37.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="croiseur" fitHeight="160.0" fitWidth="37.0" layoutX="10.0" layoutY="10.0" onDragDetected="#OnBoatStartDrag" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../Images/Croiseur.png" />
                </image>
             </ImageView>
-            <ImageView fx:id="contreTorpilleurs" fitHeight="120.0" fitWidth="60.0" layoutX="63.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="contreTorpilleurs" fitHeight="120.0" fitWidth="60.0" layoutX="63.0" layoutY="10.0" onDragDetected="#OnBoatStartDrag" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../Images/ContreTorpilleurs.png" />
                </image>
             </ImageView>
-            <ImageView fx:id="sousMarin" fitHeight="120.0" fitWidth="49.0" layoutX="116.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="sousMarin" fitHeight="120.0" fitWidth="49.0" layoutX="116.0" layoutY="10.0" onDragDetected="#OnBoatStartDrag" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../Images/SousMarin.png" />
                </image>
             </ImageView>
-            <ImageView fx:id="torpilleur" fitHeight="80.0" fitWidth="46.0" layoutX="168.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="torpilleur" fitHeight="80.0" fitWidth="46.0" layoutX="168.0" layoutY="10.0" onDragDetected="#OnBoatStartDrag" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../Images/Torpilleur.png" />
                </image>

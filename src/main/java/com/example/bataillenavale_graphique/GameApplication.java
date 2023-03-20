@@ -24,6 +24,12 @@ public class GameApplication extends Application {
         return instance;
     }
 
+    private Bataille bataille = null;
+
+    public Bataille getBataille() {
+        return bataille;
+    }
+
     /**
      * Fonction appelée au démarrage de l'application
      *
@@ -40,6 +46,8 @@ public class GameApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
+        instance = this;
+
         /*FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
         stage.setTitle("Hello!");
@@ -57,20 +65,21 @@ public class GameApplication extends Application {
      *
      * @param type Mode que l'utilisateur a choisi
      */
-    public void LancerPartie(GameType type) {
+    public void LancerPartie(Stage stage, GameType type) throws IOException {
         switch (type) {
             // Lancement du jeu en mode seul contre l'ordinateur
-            case Soloplayer:
-            {
-                Bataille bataille = new Bataille();
+            case Soloplayer -> {
+                bataille = new Bataille();
+
+                bataille.Play();
+
+                GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
             }
-            break;
+
             // Lancement du jeu en mode multijoueur contre un autre joueur
-            case Multiplayer:
-            {
+            case Multiplayer -> {
 
             }
-            break;
         }
     }
 }

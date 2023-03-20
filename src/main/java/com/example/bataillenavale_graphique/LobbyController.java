@@ -1,6 +1,7 @@
 package com.example.bataillenavale_graphique;
 
 import Utils.FxmlType;
+import Utils.GameType;
 import Utils.GameUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -28,7 +29,7 @@ public class LobbyController {
     protected void SoloButton(ActionEvent event) throws IOException {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
-        GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
+        GameApplication.getInstance().LancerPartie(stage, GameType.Soloplayer);
     }
 
     /**

@@ -21,7 +21,7 @@ public class Bataille {
     /**
      * Grille qui contient la carte du joueur
      */
-    public static int[][] grilleJeu = new int[10][10];
+    public int[][] grilleJeu = new int[10][10];
 
     /**
      * Variable aléatoire pour pouvoir générer des nombres aléatoires
@@ -29,18 +29,17 @@ public class Bataille {
     public static Random rand = new Random();
 
     /**
-     * Fonction principale qui permet de gérer le programme
+     * Fonction principale qui permet de lancer la bataille
      *
      * @since 07/02/2023
-     *
-     * @param args Arguments par défaut de la fonction main
      */
-    public static void main(String[] args) {
+    public void Play() {
         // Initialisation des 2 grilles
         initGrilleOrdi();
-        initGrilleJeu();
+        //initGrilleJeu();
         AfficherGrille(grilleJeu);
 
+/*
         // Tant qu'il reste entre des bateaux dans les deux grilles alors on joue
         while(!vainqueur(grilleJeu) && !vainqueur(grilleOrdi)) {
             // Tour de l'ordinateur
@@ -70,7 +69,7 @@ public class Bataille {
             }
         }
 
-        System.out.println("Fin de l'exécution du programme !");
+        System.out.println("Fin de l'exécution du programme !");*/
     }
 
     /**
@@ -184,7 +183,7 @@ public class Bataille {
      *
      * @since 06/02/2023
      */
-    public static void initGrilleJeu() {
+    public void initGrilleJeu() {
         AfficherGrille(grilleJeu);
 
         int idBateau = 0;
