@@ -47,6 +47,8 @@ public class BoatPlacement implements Initializable {
     @FXML
     private ImageView torpilleur;
 
+
+
     private final Map<ImageView, int[]> positionBateau = new HashMap<>();
 
 
@@ -133,20 +135,28 @@ public class BoatPlacement implements Initializable {
             System.out.println("onDragOver");
 
             Dragboard db = event.getDragboard();
+
             if (event.getGestureSource() != pane &&
                     db.hasString()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
 
                 int tailleBateau = Integer.parseInt(db.getString());
-                ImageView img = (ImageView)event.getGestureTarget();
+                ImageView img = (ImageView)event.getGestureSource();
 
+                System.out.println(img.getFitHeight());
+
+                System.out.println("X : " + img.getLayoutX() + " | Y : " + img.getLayoutY());
+                System.out.println("X : " + event.getScreenX() + " | Y : " + event.getScreenY());
                 // Horizontal
                 if(rotation == 1) {
 
                     double x = (pane.getWidth()/2)-(pane.getWidth()/2);
                     double y = (pane.getHeight()/2)-(pane.getHeight()/2);
-                    img.setX(x);
-                    img.setY(y);
+
+                    System.out.println("X : " + x + " || Y : " + y);
+
+                    img.setLayoutX(x);
+                    img.setLayoutY(y);
 
                 // Vertical
                 } else {
@@ -154,8 +164,16 @@ public class BoatPlacement implements Initializable {
                 }
             }
 
+
             pane.setBorder(new Border(new BorderStroke(Color.BLACK,
                     BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+            event.consume();
+        });
+
+        pane.setOnDragExited(event -> {
+            pane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                    BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
             event.consume();
         });
@@ -166,6 +184,7 @@ public class BoatPlacement implements Initializable {
             System.out.println("onDragDropped");
 
             Dragboard db = event.getDragboard();
+            boolean success = false;
             if (db.hasString()) {
                 int tailleBateau = Integer.parseInt(db.getString());
 
@@ -173,7 +192,11 @@ public class BoatPlacement implements Initializable {
                 boolean t = GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, rowIndex, colIndex, rotation, tailleBateau);
 
                 System.out.println("Result : " + t);
+
+                success = true;
             }
+
+            event.setDropCompleted(success);
 
             event.consume();
         });
