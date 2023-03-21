@@ -112,6 +112,7 @@ public class BoatPlacement implements Initializable {
 
     private void addPane(int colIndex, int rowIndex) {
         Pane pane = new Pane();
+        pane.setMinSize(60, 60);
         Random rand = new Random();
 
         int red = rand.nextInt(255);
@@ -130,6 +131,15 @@ public class BoatPlacement implements Initializable {
                     BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         });
 
+        pane.setOnDragExited(event -> {
+            pane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                    BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+            ImageView img = (ImageView)event.getGestureSource();
+            pane.getChildren().remove(img);
+
+            event.consume();
+        });
 
         // Event executé quand le joueur passe sa souris sur une case avec un bateau sélectionné
         pane.setOnDragOver(event -> {
@@ -144,7 +154,13 @@ public class BoatPlacement implements Initializable {
                 int tailleBateau = Integer.parseInt(db.getString());
                 ImageView img = (ImageView)event.getGestureSource();
 
+
                 // Changement de parent
+                var hBoxChild = horizontalBoxBateau.getChildren();
+                if(hBoxChild.contains(img)) {
+                    hBoxChild.remove(img);
+                }
+
                 pane.getChildren().add(img);
 
                 System.out.println(img.getFitHeight());
@@ -157,7 +173,7 @@ public class BoatPlacement implements Initializable {
                     double x = (pane.getWidth()/2)-(pane.getWidth()/2);
                     double y = (pane.getHeight()/2)-(pane.getHeight()/2);
 
-                    System.out.println("X : " + x + " || Y : " + y);
+                    System.out.println("X : " + x + " || Y : " + y + " || width : " + pane.getWidth());
 
                     img.setLayoutX(x);
                     img.setLayoutY(y);
@@ -171,13 +187,6 @@ public class BoatPlacement implements Initializable {
 
             pane.setBorder(new Border(new BorderStroke(Color.BLACK,
                     BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-
-            event.consume();
-        });
-
-        pane.setOnDragExited(event -> {
-            pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                    BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
             event.consume();
         });

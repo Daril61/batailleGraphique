@@ -58,7 +58,7 @@ public class GameUtils {
      * @since 15/03/2023
      */
     public static void ChangeScene(Stage stage, FxmlType fxml, String windowName) throws IOException {
-        stage.setMaximized(false);
+        //stage.setMaximized(false);
 
         // Récupération du fxml
         Parent root = FXMLLoader.load(
@@ -72,8 +72,9 @@ public class GameUtils {
         stage.setScene(scene);
 
         stage.setTitle(windowName);
-
-        stage.setMaximized(true);
+        stage.setMinHeight(800);
+        stage.setMinHeight(600);
+        //stage.setMaximized(true);
         stage.show();
     }
 
