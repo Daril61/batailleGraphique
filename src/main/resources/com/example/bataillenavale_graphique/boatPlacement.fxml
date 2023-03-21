@@ -14,7 +14,7 @@
       <Insets />
    </opaqueInsets>
    <children>
-      <HBox prefHeight="100.0" prefWidth="200.0" spacing="80.0">
+      <HBox fx:id="horizontalBoxBateau" prefHeight="100.0" prefWidth="200.0" spacing="80.0">
          <children>
             <ImageView fx:id="porteAvion" fitHeight="200.0" fitWidth="74.0" onDragDetected="#OnBoatStartDrag" pickOnBounds="true" preserveRatio="true">
                <image>

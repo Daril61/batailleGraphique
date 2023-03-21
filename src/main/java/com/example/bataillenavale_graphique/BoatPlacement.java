@@ -47,7 +47,8 @@ public class BoatPlacement implements Initializable {
     @FXML
     private ImageView torpilleur;
 
-
+    @FXML
+    private HBox horizontalBoxBateau;
 
     private final Map<ImageView, int[]> positionBateau = new HashMap<>();
 
@@ -73,8 +74,8 @@ public class BoatPlacement implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        for (int i = 0 ; i < 10 ; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (int i = 9 ; i >= 0 ; i--) {
+            for (int j = 9; j >= 0; j--) {
                 addPane(i, j);
             }
         }
@@ -142,6 +143,9 @@ public class BoatPlacement implements Initializable {
 
                 int tailleBateau = Integer.parseInt(db.getString());
                 ImageView img = (ImageView)event.getGestureSource();
+
+                // Changement de parent
+                pane.getChildren().add(img);
 
                 System.out.println(img.getFitHeight());
 
