@@ -29,7 +29,7 @@ public class LobbyController {
     protected void SoloButton(ActionEvent event) throws IOException {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
-        GameApplication.getInstance().LancerPartie(stage, GameType.Soloplayer);
+        GameApplication.getInstance().lancerPartie(stage, GameType.Soloplayer);
     }
 
     /**

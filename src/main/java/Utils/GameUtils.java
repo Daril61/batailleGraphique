@@ -20,6 +20,8 @@ import java.util.Objects;
  */
 public class GameUtils {
 
+    public final static int BOAT_SIZE_FOR_ONE_UNIT = 40;
+
     /**
      * Liste des tailles des bateaux dans l'ordre par rapport à la variable bateauxNom
      */
@@ -72,7 +74,7 @@ public class GameUtils {
         stage.setScene(scene);
 
         stage.setTitle(windowName);
-        stage.setMinHeight(800);
+        stage.setMinWidth(800);
         stage.setMinHeight(600);
         //stage.setMaximized(true);
         stage.show();
