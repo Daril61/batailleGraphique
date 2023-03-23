@@ -33,7 +33,7 @@ public class Bataille {
      *
      * @since 07/02/2023
      */
-    public void Play() {
+    public void play() {
         // Initialisation des 2 grilles
         initGrilleOrdi();
         //initGrilleJeu();

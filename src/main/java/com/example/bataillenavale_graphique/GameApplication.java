@@ -65,13 +65,13 @@ public class GameApplication extends Application {
      *
      * @param type Mode que l'utilisateur a choisi
      */
-    public void LancerPartie(Stage stage, GameType type) throws IOException {
+    public void lancerPartie(Stage stage, GameType type) throws IOException {
         switch (type) {
             // Lancement du jeu en mode seul contre l'ordinateur
             case Soloplayer -> {
                 bataille = new Bataille();
 
-                bataille.Play();
+                bataille.play();
 
                 GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
             }

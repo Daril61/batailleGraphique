@@ -1,5 +1,6 @@
 package com.example.bataillenavale_graphique;
 
+import Utils.BateauType;
 import Utils.GameUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,10 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Classe qui permet de gérer le placement des bateaux
@@ -34,7 +32,9 @@ public class BoatPlacement implements Initializable {
     private GridPane UIGrille;
 
     @FXML
-    private Parent parentBateau;
+    private Pane root;
+    @FXML
+    private Pane parentBateau;
 
     @FXML
     private ImageView porteAvion;
@@ -47,10 +47,7 @@ public class BoatPlacement implements Initializable {
     @FXML
     private ImageView torpilleur;
 
-    @FXML
-    private HBox horizontalBoxBateau;
-
-    private final Map<ImageView, int[]> positionBateau = new HashMap<>();
+    private final List<Bateau> bateaux = new ArrayList<>();
 
 
     /**
@@ -80,14 +77,9 @@ public class BoatPlacement implements Initializable {
             }
         }
 
-        positionBateau.put(porteAvion, new int[] {(int) porteAvion.getX(), (int) porteAvion.getY()});
-        positionBateau.put(croiseur, new int[] {(int) croiseur.getX(), (int) croiseur.getY()});
-        positionBateau.put(contreTorpilleurs, new int[] {(int) contreTorpilleurs.getX(), (int) contreTorpilleurs.getY()});
-        positionBateau.put(sousMarin, new int[] {(int) sousMarin.getX(), (int) sousMarin.getY()});
-        positionBateau.put(torpilleur, new int[] {(int) torpilleur.getX(), (int) torpilleur.getY()});
+        instantiateBoat();
     }
 
-    @FXML
     private void OnBoatStartDrag(MouseEvent event) {
         System.out.println("OnBoatDragStart()");
         System.out.println(event.getScreenX() + " - " + event.getScreenY());
@@ -131,89 +123,118 @@ public class BoatPlacement implements Initializable {
                     BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         });
 
-        pane.setOnDragExited(event -> {
-            pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                    BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        pane.setOnDragExited(dragEvent -> OnDragExited(dragEvent, pane));
 
-            ImageView img = (ImageView)event.getGestureSource();
-            pane.getChildren().remove(img);
-
-            event.consume();
-        });
-
-        // Event executé quand le joueur passe sa souris sur une case avec un bateau sélectionné
-        pane.setOnDragOver(event -> {
-            System.out.println("onDragOver");
-
-            Dragboard db = event.getDragboard();
-
-            if (event.getGestureSource() != pane &&
-                    db.hasString()) {
-                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-
-                int tailleBateau = Integer.parseInt(db.getString());
-                ImageView img = (ImageView)event.getGestureSource();
+        // Event execute quand le joueur passe sa souris sur une case avec un bateau sélectionné
+        pane.setOnDragOver(dragEvent -> OnDragOver(dragEvent, pane));
 
 
-                // Changement de parent
-                var hBoxChild = horizontalBoxBateau.getChildren();
-                if(hBoxChild.contains(img)) {
-                    hBoxChild.remove(img);
-                }
-
-                pane.getChildren().add(img);
-
-                System.out.println(img.getFitHeight());
-
-                System.out.println("X : " + img.getLayoutX() + " | Y : " + img.getLayoutY());
-                System.out.println("X : " + event.getScreenX() + " | Y : " + event.getScreenY());
-                // Horizontal
-                if(rotation == 1) {
-
-                    double x = (pane.getWidth()/2)-(pane.getWidth()/2);
-                    double y = (pane.getHeight()/2)-(pane.getHeight()/2);
-
-                    System.out.println("X : " + x + " || Y : " + y + " || width : " + pane.getWidth());
-
-                    img.setLayoutX(x);
-                    img.setLayoutY(y);
-
-                // Vertical
-                } else {
-
-                }
-            }
-
-
-            pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                    BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-
-            event.consume();
-        });
-
-
-        // Event executé quand le joueur lâche son clique sur une case
-        pane.setOnDragDropped(event -> {
-            System.out.println("onDragDropped");
-
-            Dragboard db = event.getDragboard();
-            boolean success = false;
-            if (db.hasString()) {
-                int tailleBateau = Integer.parseInt(db.getString());
-
-                // Vérification que le bateau rentre dans la case sélectionnée
-                boolean t = GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, rowIndex, colIndex, rotation, tailleBateau);
-
-                System.out.println("Result : " + t);
-
-                success = true;
-            }
-
-            event.setDropCompleted(success);
-
-            event.consume();
-        });
+        // Event execute quand le joueur lâche son clique sur une case
+        pane.setOnDragDropped(dragEvent -> OnDragDropped(dragEvent, rowIndex, colIndex));
 
         UIGrille.add(pane, colIndex, rowIndex);
     }
+
+    /**
+     * Fonction qui permet de faire apparaitre les différents bateaux présents dans le jeu
+     */
+    private void instantiateBoat() {
+        //GameApplication.getInstance().
+
+        bateaux.add(new Bateau(BateauType.PorteAvion, 0, 0));
+        bateaux.add(new Bateau(BateauType.Croiseur, 0, 0));
+        bateaux.add(new Bateau(BateauType.ContreTorpilleurs, 0, 0));
+        bateaux.add(new Bateau(BateauType.SousMarin, 0, 0));
+        bateaux.add(new Bateau(BateauType.Torpilleur, 0, 0));
+
+        for (int i = 0; i < bateaux.size(); i++) {
+            Bateau b = bateaux.get(i);
+            b.changeParent(parentBateau);
+
+            b.getImage().setOnDragDetected(this::OnBoatStartDrag);
+        }
+    }
+
+    private void OnDragOver(DragEvent event, Pane pane) {
+        System.out.println("onDragOver");
+
+        // Récupération de la source
+        ImageView source = (ImageView)event.getGestureSource();
+
+        Dragboard db = event.getDragboard();
+
+        if (event.getGestureSource() != pane &&
+                db.hasString()) {
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+            // Vérification que la
+
+            System.out.println(source.getFitHeight());
+
+            System.out.println("X : " + source.getLayoutX() + " | Y : " + source.getLayoutY());
+            System.out.println("X : " + event.getScreenX() + " | Y : " + event.getScreenY());
+
+            if(rotation == 1) {
+                // Horizontal
+
+                double x = (pane.getWidth()/2)-(pane.getWidth()/2);
+                double y = (pane.getHeight()/2)-(pane.getHeight()/2);
+
+                System.out.println("X : " + x + " || Y : " + y + " || width : " + pane.getWidth());
+
+                source.setLayoutX(x);
+                source.setLayoutY(y);
+
+
+            } else {
+                // Vertical
+
+
+            }
+        }
+
+
+        pane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+        event.consume();
+    }
+
+    private void OnDragExited(DragEvent event, Pane pane) {
+        pane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+        event.consume();
+    }
+
+    private void OnDragDropped(DragEvent event, int l, int c) {
+        System.out.println("onDragDropped");
+
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+        if (db.hasString()) {
+            int tailleBateau = Integer.parseInt(db.getString());
+
+            // Vérification que le bateau rentre dans la case sélectionnée
+            if(GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, l, c, rotation, tailleBateau)) {
+                // Récupération de l'image
+                ImageView img = (ImageView)event.getGestureSource();
+
+                // On retire le bateau de son parent
+                parentBateau.getChildren().remove(img);
+
+                // Modification de la rotation
+                root.getChildren().add(img);
+                //img.
+            }
+
+            success = true;
+        }
+
+        event.setDropCompleted(success);
+
+        event.consume();
+    }
+
+
 }
