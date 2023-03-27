@@ -1,20 +1,30 @@
 package com.example.bataillenavale_graphique;
 
 import Utils.BateauType;
+import Utils.FxmlType;
 import Utils.GameUtils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
+import java.security.Key;
 import java.util.*;
 
 /**
@@ -48,13 +58,14 @@ public class BoatPlacement implements Initializable {
     private ImageView torpilleur;
 
     private final List<Bateau> bateaux = new ArrayList<>();
-
+    private boolean isKeyEventInitialize = false;
+    private ImageView selectedBoat = null;
 
     /**
      * Variable qui permet d'avoir la rotation du bateau que l'on pose
      * (1 => Horizontal | 2 => Vertical)
      */
-    private int rotation = 1;
+    private int rotation = 2;
 
     @FXML
     public void clickGrid(MouseEvent event) {
@@ -76,8 +87,18 @@ public class BoatPlacement implements Initializable {
                 addPane(i, j);
             }
         }
-
         instantiateBoat();
+
+        root.sceneProperty().addListener(new ChangeListener<Scene>() {
+            @Override
+            public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
+                if(newValue != null){
+                    root.requestFocus();
+                }
+            }
+        });
+
+        root.setOnKeyPressed(this::OnKeyPressed);
     }
 
     private void OnBoatStartDrag(MouseEvent event) {
@@ -101,6 +122,9 @@ public class BoatPlacement implements Initializable {
 
         event.consume();
     }
+    private void OnKeyPressed(KeyEvent event) {
+        System.out.println("tzrzerzesdd");
+    }
 
     private void addPane(int colIndex, int rowIndex) {
         Pane pane = new Pane();
@@ -111,16 +135,18 @@ public class BoatPlacement implements Initializable {
         int green = rand.nextInt(255);
         int blue = rand.nextInt(255);
 
-        pane.setBackground(new Background(new BackgroundFill(Color.rgb(red, green, blue), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBackground(new Background(new BackgroundFill(Color.rgb(red, green, blue, 0), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
         pane.setOnMouseEntered(e -> {
             pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                    BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                    BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))));
         });
 
         pane.setOnMouseExited(e -> {
             pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                    BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                    BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         });
 
         pane.setOnDragExited(dragEvent -> OnDragExited(dragEvent, pane));
@@ -134,13 +160,17 @@ public class BoatPlacement implements Initializable {
 
         UIGrille.add(pane, colIndex, rowIndex);
     }
+    private void OnBoatSelect(MouseEvent event) {
+        // Récupération de l'image
+        selectedBoat = (ImageView)event.getSource();
+
+
+    }
 
     /**
      * Fonction qui permet de faire apparaitre les différents bateaux présents dans le jeu
      */
     private void instantiateBoat() {
-        //GameApplication.getInstance().
-
         bateaux.add(new Bateau(BateauType.PorteAvion, 0, 0));
         bateaux.add(new Bateau(BateauType.Croiseur, 0, 0));
         bateaux.add(new Bateau(BateauType.ContreTorpilleurs, 0, 0));
@@ -152,11 +182,13 @@ public class BoatPlacement implements Initializable {
             b.changeParent(parentBateau);
 
             b.getImage().setOnDragDetected(this::OnBoatStartDrag);
+            b.getImage().addEventHandler(MouseEvent.MOUSE_CLICKED, this::OnBoatSelect);
+            b.getImage().setOnKeyPressed(this::OnKeyPressed);
         }
     }
 
     private void OnDragOver(DragEvent event, Pane pane) {
-        System.out.println("onDragOver");
+        //System.out.println("onDragOver");
 
         // Récupération de la source
         ImageView source = (ImageView)event.getGestureSource();
@@ -169,10 +201,10 @@ public class BoatPlacement implements Initializable {
 
             // Vérification que la
 
-            System.out.println(source.getFitHeight());
+            //System.out.println(source.getFitHeight());
 
-            System.out.println("X : " + source.getLayoutX() + " | Y : " + source.getLayoutY());
-            System.out.println("X : " + event.getScreenX() + " | Y : " + event.getScreenY());
+            //System.out.println("X : " + source.getLayoutX() + " | Y : " + source.getLayoutY());
+            //System.out.println("X : " + event.getScreenX() + " | Y : " + event.getScreenY());
 
             if(rotation == 1) {
                 // Horizontal
@@ -180,7 +212,7 @@ public class BoatPlacement implements Initializable {
                 double x = (pane.getWidth()/2)-(pane.getWidth()/2);
                 double y = (pane.getHeight()/2)-(pane.getHeight()/2);
 
-                System.out.println("X : " + x + " || Y : " + y + " || width : " + pane.getWidth());
+                //System.out.println("X : " + x + " || Y : " + y + " || width : " + pane.getWidth());
 
                 source.setLayoutX(x);
                 source.setLayoutY(y);
@@ -195,14 +227,14 @@ public class BoatPlacement implements Initializable {
 
 
         pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))));
 
         event.consume();
     }
 
     private void OnDragExited(DragEvent event, Pane pane) {
         pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
         event.consume();
     }
@@ -217,6 +249,8 @@ public class BoatPlacement implements Initializable {
 
             // Vérification que le bateau rentre dans la case sélectionnée
             if(GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, l, c, rotation, tailleBateau)) {
+
+
                 // Récupération de l'image
                 ImageView img = (ImageView)event.getGestureSource();
 
@@ -225,6 +259,14 @@ public class BoatPlacement implements Initializable {
 
                 // Modification de la rotation
                 root.getChildren().add(img);
+
+                Bounds b = GetBounds(event);
+
+                System.out.println(event.getSceneX());
+                System.out.println(event.getSceneY());
+
+                img.setLayoutX(event.getSceneX()/*b.getMinX() + (b.getMaxX() - b.getMinX())*/);
+                img.setLayoutY(event.getSceneY()/*b.getMinY() + (b.getMaxY() - b.getMinY())*/);
                 //img.
             }
 
@@ -236,5 +278,19 @@ public class BoatPlacement implements Initializable {
         event.consume();
     }
 
+    /**
+     * Fonction pour récupérer les contours d'une cellule
+     *
+     * @param event Event lors du drag and drop
+     * @return Retourne les contours de la cellule
+     */
+    private Bounds GetBounds(DragEvent event) {
+        Node source = event.getPickResult().getIntersectedNode();
+        Integer colIndex = GridPane.getColumnIndex(source);
+        Integer rowIndex = GridPane.getRowIndex(source);
 
+        if(colIndex == null || rowIndex == null) return null;
+
+        return UIGrille.getCellBounds(colIndex, rowIndex);
+    }
 }
