@@ -88,40 +88,8 @@ public class BoatPlacement implements Initializable {
             }
         }
         instantiateBoat();
-
-        root.sceneProperty().addListener(new ChangeListener<Scene>() {
-            @Override
-            public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
-                if(newValue != null){
-                    root.requestFocus();
-                }
-            }
-        });
-
-        root.setOnKeyPressed(this::OnKeyPressed);
     }
 
-    private void OnBoatStartDrag(MouseEvent event) {
-        System.out.println("OnBoatDragStart()");
-        System.out.println(event.getScreenX() + " - " + event.getScreenY());
-
-        // Récupération de l'image
-        ImageView img = (ImageView)event.getSource();
-
-        // Création du drag and drop
-        Dragboard db = img.startDragAndDrop(TransferMode.ANY);
-
-        // On donne la taille du bateau
-        ClipboardContent content = new ClipboardContent();
-
-        // Transformation de la taille du bateau sélectionné en un string
-        String taille = String.valueOf((int)(img.getFitHeight()/40));
-
-        content.putString(taille);
-        db.setContent(content);
-
-        event.consume();
-    }
     private void OnKeyPressed(KeyEvent event) {
         System.out.println("tzrzerzesdd");
     }
@@ -154,7 +122,6 @@ public class BoatPlacement implements Initializable {
         // Event execute quand le joueur passe sa souris sur une case avec un bateau sélectionné
         pane.setOnDragOver(dragEvent -> OnDragOver(dragEvent, pane));
 
-
         // Event execute quand le joueur lâche son clique sur une case
         pane.setOnDragDropped(dragEvent -> OnDragDropped(dragEvent, rowIndex, colIndex));
 
@@ -181,10 +148,33 @@ public class BoatPlacement implements Initializable {
             Bateau b = bateaux.get(i);
             b.changeParent(parentBateau);
 
-            b.getImage().setOnDragDetected(this::OnBoatStartDrag);
-            b.getImage().addEventHandler(MouseEvent.MOUSE_CLICKED, this::OnBoatSelect);
-            b.getImage().setOnKeyPressed(this::OnKeyPressed);
+            b.getImage().setOnDragDetected(this::OnDragStart);
         }
+    }
+
+    private void OnDragStart(MouseEvent event) {
+
+        System.out.println("OnBoatDragStart()");
+        System.out.println(event.getScreenX() + " - " + event.getScreenY());
+
+        // Récupération de l'image
+        ImageView img = (ImageView)event.getSource();
+        // Permet de rendre l'image "Invisible pour la souris lors du placement"
+        img.setMouseTransparent(true);
+
+        // Création du drag and drop
+        Dragboard db = img.startDragAndDrop(TransferMode.ANY);
+
+        // On donne la taille du bateau
+        ClipboardContent content = new ClipboardContent();
+
+        // Transformation de la taille du bateau sélectionné en un string
+        String taille = String.valueOf((int)(img.getFitHeight()/40));
+
+        content.putString(taille);
+        db.setContent(content);
+
+        event.consume();
     }
 
     private void OnDragOver(DragEvent event, Pane pane) {
@@ -243,16 +233,19 @@ public class BoatPlacement implements Initializable {
         System.out.println("onDragDropped");
 
         Dragboard db = event.getDragboard();
+
+        // Récupération de l'image
+        ImageView img = (ImageView)event.getGestureSource();
+
+        img.setMouseTransparent(false);
+
         boolean success = false;
         if (db.hasString()) {
             int tailleBateau = Integer.parseInt(db.getString());
 
             // Vérification que le bateau rentre dans la case sélectionnée
             if(GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, l, c, rotation, tailleBateau)) {
-
-
-                // Récupération de l'image
-                ImageView img = (ImageView)event.getGestureSource();
+                System.out.println("test");
 
                 // On retire le bateau de son parent
                 parentBateau.getChildren().remove(img);
@@ -268,6 +261,8 @@ public class BoatPlacement implements Initializable {
                 img.setLayoutX(event.getSceneX()/*b.getMinX() + (b.getMaxX() - b.getMinX())*/);
                 img.setLayoutY(event.getSceneY()/*b.getMinY() + (b.getMaxY() - b.getMinY())*/);
                 //img.
+
+                img.setMouseTransparent(true);
             }
 
             success = true;

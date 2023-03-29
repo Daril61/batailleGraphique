@@ -38,7 +38,7 @@
             <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <TilePane fx:id="parentBateau" prefHeight="210.0" prefWidth="800.0">
+      <TilePane fx:id="parentBateau" layoutY="25.0" prefHeight="185.0" prefWidth="800.0">
          <padding>
             <Insets top="4.0" />
          </padding>
@@ -47,7 +47,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Jeu">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#Recommencer" text="Recommencer" />
+              <MenuItem mnemonicParsing="false" text="Recommencer" />
             </items>
           </Menu>
         </menus>
