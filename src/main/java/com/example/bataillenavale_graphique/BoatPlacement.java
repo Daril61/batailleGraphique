@@ -1,6 +1,7 @@
 package com.example.bataillenavale_graphique;
 
 import Utils.BateauType;
+import Utils.EventKeyPressed;
 import Utils.FxmlType;
 import Utils.GameUtils;
 import javafx.beans.value.ChangeListener;
@@ -33,7 +34,7 @@ import java.util.*;
  * @author Romain Veydarier
  * @since 15/03/2023
  */
-public class BoatPlacement implements Initializable {
+public class BoatPlacement implements Initializable, EventKeyPressed {
 
     /**
      * Grille du jeu pour la partie interface
@@ -82,16 +83,14 @@ public class BoatPlacement implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        GameApplication.getInstance().addListeners(this);
+
         for (int i = 9 ; i >= 0 ; i--) {
             for (int j = 9; j >= 0; j--) {
                 addPane(i, j);
             }
         }
         instantiateBoat();
-    }
-
-    private void OnKeyPressed(KeyEvent event) {
-        System.out.println("tzrzerzesdd");
     }
 
     private void addPane(int colIndex, int rowIndex) {
@@ -134,6 +133,11 @@ public class BoatPlacement implements Initializable {
 
     }
 
+    @Override
+    public void OnKeyPressed(String key) {
+        System.out.println("test" + key);
+    }
+
     /**
      * Fonction qui permet de faire apparaitre les différents bateaux présents dans le jeu
      */
@@ -148,19 +152,20 @@ public class BoatPlacement implements Initializable {
             Bateau b = bateaux.get(i);
             b.changeParent(parentBateau);
 
-            b.getImage().setOnDragDetected(this::OnDragStart);
+            b.getImage().setOnDragDetected(this::OnDragDetected);
+            b.getImage().setOnDragDone(this::OnDragDone);
         }
     }
 
-    private void OnDragStart(MouseEvent event) {
-
-        System.out.println("OnBoatDragStart()");
+    private void OnDragDetected(MouseEvent event) {
         System.out.println(event.getScreenX() + " - " + event.getScreenY());
 
         // Récupération de l'image
         ImageView img = (ImageView)event.getSource();
         // Permet de rendre l'image "Invisible pour la souris lors du placement"
         img.setMouseTransparent(true);
+
+        img.setOnKeyPressed(this::OnKeyPressed);
 
         // Création du drag and drop
         Dragboard db = img.startDragAndDrop(TransferMode.ANY);
@@ -237,8 +242,6 @@ public class BoatPlacement implements Initializable {
         // Récupération de l'image
         ImageView img = (ImageView)event.getGestureSource();
 
-        img.setMouseTransparent(false);
-
         boolean success = false;
         if (db.hasString()) {
             int tailleBateau = Integer.parseInt(db.getString());
@@ -246,6 +249,8 @@ public class BoatPlacement implements Initializable {
             // Vérification que le bateau rentre dans la case sélectionnée
             if(GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, l, c, rotation, tailleBateau)) {
                 System.out.println("test");
+
+                //GameApplication.getInstance().getBataille().ajouterBateau();
 
                 // On retire le bateau de son parent
                 parentBateau.getChildren().remove(img);
@@ -261,8 +266,6 @@ public class BoatPlacement implements Initializable {
                 img.setLayoutX(event.getSceneX()/*b.getMinX() + (b.getMaxX() - b.getMinX())*/);
                 img.setLayoutY(event.getSceneY()/*b.getMinY() + (b.getMaxY() - b.getMinY())*/);
                 //img.
-
-                img.setMouseTransparent(true);
             }
 
             success = true;
@@ -271,6 +274,31 @@ public class BoatPlacement implements Initializable {
         event.setDropCompleted(success);
 
         event.consume();
+    }
+
+    private void OnDragDone(DragEvent event) {
+        // Récupération de l'image
+        ImageView img = (ImageView)event.getGestureSource();
+
+        if (event.getTransferMode() == TransferMode.MOVE) {
+            // On rend l'image impossible à cliquer, car elle est placée sur la grille
+            img.setMouseTransparent(true);
+        } else {
+            // On rend l'image possible d'être cliqué, car elle n'est pas placée
+            img.setMouseTransparent(false);
+        }
+
+        img.setOnKeyPressed(null);
+
+        event.consume();
+    }
+
+    private void OnKeyPressed(KeyEvent event) {
+        System.out.println("testzadzadzadazdzadza");
+
+        if (event.getCode() == KeyCode.R) {
+            rotation = rotation == 2 ? 1 : 2;
+        }
     }
 
     /**

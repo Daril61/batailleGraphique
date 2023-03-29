@@ -1,14 +1,19 @@
 package com.example.bataillenavale_graphique;
 
+import Utils.EventKeyPressed;
 import Utils.FxmlType;
 import Utils.GameType;
 import Utils.GameUtils;
 import javafx.application.Application;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe principal de l'application
@@ -29,6 +34,8 @@ public class GameApplication extends Application {
     public Bataille getBataille() {
         return bataille;
     }
+
+    private List<EventKeyPressed> listeners = new ArrayList<EventKeyPressed>();
 
     /**
      * Fonction appelée au démarrage de l'application
@@ -61,7 +68,27 @@ public class GameApplication extends Application {
     }
 
     /**
-     * FFonction pour lancer une partie gérée par l'application
+     * Fonction pour ajouter un objet qui écoute
+     * @param e Classe qui veut être ajouté
+     */
+    public void addListeners(EventKeyPressed e)
+    {
+        listeners.add(e);
+    }
+
+    /**
+     * Fonction qui permet de notifier toutes les classes qui veulent savoir qu'une touche est appuyé.
+     *
+     * @param key Touche appuyée
+     */
+    public void notifyEventKeyPressed(String key) {
+        for (EventKeyPressed e : listeners) {
+            e.OnKeyPressed(key);
+        }
+    }
+
+    /**
+     * Fonction pour lancer une partie gérée par l'application
      *
      * @param type Mode que l'utilisateur a choisi
      */
