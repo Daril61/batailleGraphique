@@ -2,8 +2,8 @@ package Utils;
 
 public enum RotateType {
 
-    HORIZONTAL(1),
-    VERTICAL(2);
+    VERTICAL(1),
+    HORIZONTAL(2);
 
     private final int rotate;
 

@@ -21,6 +21,10 @@ public class Bateau {
     public int y() { return (int)img.getY(); }
 
     private final BateauType type;
+    public int size() { return type.getTailleBateau(); }
+    public int id() { return type.getIdBateau(); }
+
+    public boolean place = false;
 
     // 1 => Horizontal || 2 => Vertical
     private RotateType rotate = RotateType.HORIZONTAL;
@@ -38,9 +42,13 @@ public class Bateau {
     }
 
     public void placer(int x, int y) {
-        img.setX(x);
-        img.setY(y);
+        img.setLayoutX(x);
+        img.setLayoutY(y);
     }
+    public void place(boolean isPlace) {
+        place = isPlace;
+    }
+    public boolean getPlace() { return place; }
 
     public void changeRotate(RotateType rotate) {
         this.rotate = rotate;
@@ -48,12 +56,14 @@ public class Bateau {
         switch (rotate) {
             case HORIZONTAL:
             {
-
+                img.setRotate(0);
             }
+            break;
             case VERTICAL:
             {
-
+                img.setRotate(90);
             }
+            break;
         }
     }
 

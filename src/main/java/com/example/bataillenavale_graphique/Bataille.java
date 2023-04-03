@@ -133,7 +133,7 @@ public class Bataille {
      * @param t Nombre de cases que prend le bateau
      * @param idBateauGrille Identifiant du bateau à afficher sur la grille
      */
-    public static void ajouterBateau(int[][] grille, int l, int c, int d, int t, int idBateauGrille) {
+    public void ajouterBateau(int[][] grille, int l, int c, int d, int t, int idBateauGrille) {
         // Ajout du bateau sur le plateau de l'ordinateur
         if(d == 1) {
             for (int i = c; i > (c - t); i--) {
@@ -151,7 +151,7 @@ public class Bataille {
      *
      * @since 06/02/2023
      */
-    public static void initGrilleOrdi() {
+    public void initGrilleOrdi() {
         // Numéro de ligne ( 0 - 9 )
         int l = randRange(0, 10);
         // Numéro de colonne ( 0 - 9 )
@@ -316,7 +316,7 @@ public class Bataille {
      *
      * @param grille Une grille de 10 x 10
      */
-    public static void AfficherGrille(int[][] grille) {
+    public void AfficherGrille(int[][] grille) {
         System.out.print("  ");
         // Affichage des lettres
         for (int i = 0; i < GameUtils.colonne.length; i++) {

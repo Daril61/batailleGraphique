@@ -2,30 +2,20 @@ package com.example.bataillenavale_graphique;
 
 import Utils.BateauType;
 import Utils.EventKeyPressed;
-import Utils.FxmlType;
 import Utils.GameUtils;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.image.Image;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+import Utils.RotateType;
 
-import java.io.IOException;
 import java.net.URL;
-import java.security.Key;
 import java.util.*;
 
 /**
@@ -58,15 +48,14 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
     @FXML
     private ImageView torpilleur;
 
+    @FXML
+    private Label rotationInfo;
+
     private final List<Bateau> bateaux = new ArrayList<>();
     private boolean isKeyEventInitialize = false;
     private ImageView selectedBoat = null;
 
-    /**
-     * Variable qui permet d'avoir la rotation du bateau que l'on pose
-     * (1 => Horizontal | 2 => Vertical)
-     */
-    private int rotation = 2;
+    private RotateType rotation = RotateType.HORIZONTAL;
 
     @FXML
     public void clickGrid(MouseEvent event) {
@@ -126,12 +115,6 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
 
         UIGrille.add(pane, colIndex, rowIndex);
     }
-    private void OnBoatSelect(MouseEvent event) {
-        // Récupération de l'image
-        selectedBoat = (ImageView)event.getSource();
-
-
-    }
 
     @Override
     public void OnKeyPressed(String key) {
@@ -183,44 +166,14 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
     }
 
     private void OnDragOver(DragEvent event, Pane pane) {
-        //System.out.println("onDragOver");
-
-        // Récupération de la source
-        ImageView source = (ImageView)event.getGestureSource();
-
         Dragboard db = event.getDragboard();
 
         if (event.getGestureSource() != pane &&
                 db.hasString()) {
             event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-
-            // Vérification que la
-
-            //System.out.println(source.getFitHeight());
-
-            //System.out.println("X : " + source.getLayoutX() + " | Y : " + source.getLayoutY());
-            //System.out.println("X : " + event.getScreenX() + " | Y : " + event.getScreenY());
-
-            if(rotation == 1) {
-                // Horizontal
-
-                double x = (pane.getWidth()/2)-(pane.getWidth()/2);
-                double y = (pane.getHeight()/2)-(pane.getHeight()/2);
-
-                //System.out.println("X : " + x + " || Y : " + y + " || width : " + pane.getWidth());
-
-                source.setLayoutX(x);
-                source.setLayoutY(y);
-
-
-            } else {
-                // Vertical
-
-
-            }
         }
 
-
+        //System.out.println("onDragOver");
         pane.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))));
 
@@ -245,12 +198,19 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         boolean success = false;
         if (db.hasString()) {
             int tailleBateau = Integer.parseInt(db.getString());
+            Bataille bataille = GameApplication.getInstance().getBataille();
 
             // Vérification que le bateau rentre dans la case sélectionnée
-            if(GameUtils.posOk(GameApplication.getInstance().getBataille().grilleJeu, l, c, rotation, tailleBateau)) {
+            if(GameUtils.posOk(bataille.grilleJeu, l, c, rotation.getRotate(), tailleBateau)) {
                 System.out.println("test");
 
-                //GameApplication.getInstance().getBataille().ajouterBateau();
+                Bateau bateau = ImageToBateau(img);
+
+                assert bateau != null;
+                bateau.place(true);
+                System.out.println(rotation.getRotate());
+                bataille.ajouterBateau(bataille.grilleJeu, l, c, rotation.getRotate(), bateau.size(), bateau.id());
+                bataille.AfficherGrille(bataille.grilleJeu);
 
                 // On retire le bateau de son parent
                 parentBateau.getChildren().remove(img);
@@ -258,14 +218,14 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
                 // Modification de la rotation
                 root.getChildren().add(img);
 
+                bateau.changeRotate(rotation);
+
                 Bounds b = GetBounds(event);
 
                 System.out.println(event.getSceneX());
                 System.out.println(event.getSceneY());
 
-                img.setLayoutX(event.getSceneX()/*b.getMinX() + (b.getMaxX() - b.getMinX())*/);
-                img.setLayoutY(event.getSceneY()/*b.getMinY() + (b.getMaxY() - b.getMinY())*/);
-                //img.
+                bateau.placer((int)event.getSceneX(), (int)event.getSceneY());
             }
 
             success = true;
@@ -279,8 +239,10 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
     private void OnDragDone(DragEvent event) {
         // Récupération de l'image
         ImageView img = (ImageView)event.getGestureSource();
+        Bateau bateau = ImageToBateau(img);
+        assert bateau != null;
 
-        if (event.getTransferMode() == TransferMode.MOVE) {
+        if (bateau.getPlace()) {
             // On rend l'image impossible à cliquer, car elle est placée sur la grille
             img.setMouseTransparent(true);
         } else {
@@ -297,7 +259,8 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         System.out.println("testzadzadzadazdzadza");
 
         if (event.getCode() == KeyCode.R) {
-            rotation = rotation == 2 ? 1 : 2;
+            System.out.println("RRRRRR");
+            //rotation = rotation == 2 ? 1 : 2;
         }
     }
 
@@ -315,5 +278,27 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         if(colIndex == null || rowIndex == null) return null;
 
         return UIGrille.getCellBounds(colIndex, rowIndex);
+    }
+
+    @FXML
+    private void DoRotation() {
+        rotation = (rotation.getRotate() + 1) > 2 ? RotateType.VERTICAL : RotateType.HORIZONTAL;
+
+        // Changement du texte de la rotation
+        switch (rotation) {
+            case HORIZONTAL -> rotationInfo.setText("Horizontal");
+            case VERTICAL -> rotationInfo.setText("Vertical");
+        }
+    }
+
+    private Bateau ImageToBateau(ImageView img) {
+        for(Bateau bateau : bateaux) {
+            if(img == bateau.getImage())
+            {
+                return bateau;
+            }
+        }
+
+        return null;
     }
 }
