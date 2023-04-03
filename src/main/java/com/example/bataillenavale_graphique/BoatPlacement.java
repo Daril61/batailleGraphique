@@ -113,6 +113,7 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         // Event execute quand le joueur lâche son clique sur une case
         pane.setOnDragDropped(dragEvent -> OnDragDropped(dragEvent, rowIndex, colIndex));
 
+        GridPane.setConstraints(pane, colIndex, rowIndex);
         UIGrille.add(pane, colIndex, rowIndex);
     }
 
@@ -212,19 +213,23 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
                 bataille.ajouterBateau(bataille.grilleJeu, l, c, rotation.getRotate(), bateau.size(), bateau.id());
                 bataille.AfficherGrille(bataille.grilleJeu);
 
-                // On retire le bateau de son parent
+                // Changement du parent du bateau pour pouvoir le placer librement dans la carte
                 parentBateau.getChildren().remove(img);
-
-                // Modification de la rotation
                 root.getChildren().add(img);
 
+                /*Pane pane = (Pane)(UIGrille.getChildren().get(7 * l + 11 * c));
+                System.out.println(c * 9 + l);
+                pane.getChildren().add(img);*/
+
+                // Modification de la rotation
                 bateau.changeRotate(rotation);
+
 
                 Bounds b = GetBounds(event);
 
                 System.out.println(event.getSceneX());
                 System.out.println(event.getSceneY());
-
+                //bateau.placer(0, 0);
                 bateau.placer((int)event.getSceneX(), (int)event.getSceneY());
             }
 

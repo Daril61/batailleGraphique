@@ -32,8 +32,8 @@ public class Bateau {
     public Bateau(BateauType type, int x, int y) {
         this.type = type;
 
-        Image image = new Image(type.getImageURL());
-        System.out.println("URL : " + type.getImageURL() + " | taille image : " + image.getWidth() + "x" + image.getHeight());
+        Image image = new Image(type.getImageURLHorizontal());
+        System.out.println("URL : " + type.getImageURLHorizontal() + " | taille image : " + image.getWidth() + "x" + image.getHeight());
         img = new ImageView(image);
 
         img.setFitHeight(GameUtils.BOAT_SIZE_FOR_ONE_UNIT * this.type.getTailleBateau());
@@ -56,7 +56,7 @@ public class Bateau {
         switch (rotate) {
             case HORIZONTAL:
             {
-                img.setRotate(0);
+
             }
             break;
             case VERTICAL:
