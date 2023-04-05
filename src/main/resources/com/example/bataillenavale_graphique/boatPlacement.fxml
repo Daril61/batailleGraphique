@@ -15,7 +15,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <Pane fx:id="root" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bataillenavale_graphique.BoatPlacement">
    <children>
       <VBox layoutY="25.0">
@@ -34,7 +33,7 @@
             </TilePane>
             <HBox>
                <children>
-                  <GridPane fx:id="UIGrille" onMouseClicked="#clickGrid" prefHeight="600.0" prefWidth="600.0">
+                  <GridPane fx:id="UIGrille" prefHeight="600.0" prefWidth="600.0">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="60.0" prefWidth="60.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="60.0" prefWidth="60.0" />
@@ -60,7 +59,13 @@
                         <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                   </GridPane>
-                  <Button mnemonicParsing="false" onAction="#DoRotation" text="Rotation" />
+                  <VBox spacing="6.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#DoRotation" prefHeight="25.0" prefWidth="90.0" text="Rotation" />
+                        <Button fx:id="restartButton" mnemonicParsing="false" onAction="#OnRestartButton" prefHeight="25.0" text="Recommencer" />
+                        <Button fx:id="readyButton" mnemonicParsing="false" onAction="#OnReadyButton" prefHeight="25.0" prefWidth="90.0" text="Prêt" />
+                     </children>
+                  </VBox>
                </children>
             </HBox>
          </children>

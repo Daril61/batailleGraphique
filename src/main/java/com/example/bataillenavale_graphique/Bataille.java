@@ -1,10 +1,11 @@
 package com.example.bataillenavale_graphique;
 
 import Utils.GameUtils;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.scene.layout.Pane;
 
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Classe principale du jeu de bataille navale
@@ -23,23 +24,31 @@ public class Bataille {
      */
     public int[][] grilleJeu = new int[10][10];
 
+    public List<Bateau> leftBateau = new ArrayList<>();
+    public List<Bateau> rightBateau = new ArrayList<>();
+
     /**
      * Variable aléatoire pour pouvoir générer des nombres aléatoires
      */
     public static Random rand = new Random();
+
+    private GameSceneController gsc;
 
     /**
      * Fonction principale qui permet de lancer la bataille
      *
      * @since 07/02/2023
      */
-    public void play() {
+    public Bataille() {
         // Initialisation des 2 grilles
         initGrilleOrdi();
         //initGrilleJeu();
         AfficherGrille(grilleJeu);
+    }
 
-/*
+    public void play(GameSceneController gsc) {
+        this.gsc = gsc;
+
         // Tant qu'il reste entre des bateaux dans les deux grilles alors on joue
         while(!vainqueur(grilleJeu) && !vainqueur(grilleOrdi)) {
             // Tour de l'ordinateur
@@ -57,8 +66,10 @@ public class Bataille {
             System.out.println();
             AfficherGrille(grilleJeu);
             // Tour du joueur
-            position = demandePosition();
-            mouvement(grilleOrdi, position[0], position[1]);
+            System.out.println("C'est à votre tour");
+            //position = demandePosition();
+            //mouvement(grilleOrdi, position[0], position[1]);
+            mouvement(grilleOrdi, 1, 1);
 
             // Vérification que le joueur a gagné
             if(vainqueur(grilleOrdi)) {
@@ -69,7 +80,7 @@ public class Bataille {
             }
         }
 
-        System.out.println("Fin de l'exécution du programme !");*/
+        System.out.println("Fin de l'exécution du programme !");
     }
 
     /**
@@ -147,6 +158,13 @@ public class Bataille {
     }
 
     /**
+     * Fonction pour réinitialiser une grille à une grille vide
+     */
+    public void resetGrille() {
+        grilleJeu = new int[10][10];
+    }
+
+    /**
      * Fonction pour initialiser la grille de l'ordinateur avec la mise en place des 5 bateauxTaille sur sa grille
      *
      * @since 06/02/2023
@@ -174,47 +192,6 @@ public class Bataille {
                 l = randRange(0, 10);
                 c = randRange(0, 10);
                 d = randRange(1, 3);
-            }
-        }
-    }
-
-    /**
-     * Fonction pour initialiser la grille du joueur par rapport aux informations que le joueur nous fournit
-     *
-     * @since 06/02/2023
-     */
-    public void initGrilleJeu() {
-        AfficherGrille(grilleJeu);
-
-        int idBateau = 0;
-        int t;
-
-        while (idBateau < GameUtils.bateauxTaille.length) {
-            t = GameUtils.bateauxTaille[idBateau];
-            Scanner scanner = new Scanner(System.in);
-
-            System.out.println("Placement d'un " + GameUtils.bateauxNom[idBateau]);
-            int[] position = demandePosition();
-            int l = position[0];
-            int c = position[1];
-
-            int d = -1;
-            while(!(d >= 1 && d <= 2)) {
-                System.out.print("Entrer la direction (1 : horizontal | 2 : vertical) : ");
-                if(scanner.hasNextInt())
-                    d = scanner.nextInt();
-
-                scanner.nextLine();
-            }
-
-            // Si on peut placer le bateau
-            if(GameUtils.posOk(grilleJeu, l, c, d, t)) {
-                ajouterBateau(grilleJeu, l, c, d, t, (idBateau + 1));
-                AfficherGrille(grilleJeu);
-                idBateau++;
-
-            } else {
-                System.out.println("Erreur: Le " + GameUtils.bateauxNom[idBateau] + " ne rentre pas dans la grille.");
             }
         }
     }
@@ -255,7 +232,16 @@ public class Bataille {
      * @param l Un numéro de ligne
      * @param c Un numéro de colonne
      */
-    public static void mouvement(int[][] grille, int l, int c) {
+    public void mouvement(int[][] grille, int l, int c) {
+        Pane pane = (Pane)gsc.getLeftGrid().getChildren().get(l * gsc.getLeftGrid().getColumnCount() + c);
+
+        Bounds bounds = pane.getBoundsInLocal();
+        double centerX = bounds.getMinX() + bounds.getWidth() / 2.0;
+        double centerY = bounds.getMinY() + bounds.getHeight() / 2.0;
+        Point2D centerInScene = pane.localToScene(centerX, centerY);
+
+        Bullet bullet = new Bullet(0, 0, (int)centerInScene.getX(), (int)centerInScene.getY(), gsc.getRoot());
+
         // Vérification que la position touche de l'eau ou un bateau déjà touché
         if(grille[l][c] <= 0 || grille[l][c] >= 6) {
             System.out.println("[" + GameUtils.colonne[c] + " " + (l + 1) + "] À l’eau ");

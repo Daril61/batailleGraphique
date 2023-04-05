@@ -1,20 +1,22 @@
 package com.example.bataillenavale_graphique;
 
-import Utils.BateauType;
-import Utils.EventKeyPressed;
-import Utils.GameUtils;
+import Utils.*;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import Utils.RotateType;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -24,7 +26,7 @@ import java.util.*;
  * @author Romain Veydarier
  * @since 15/03/2023
  */
-public class BoatPlacement implements Initializable, EventKeyPressed {
+public class BoatPlacement implements Initializable {
 
     /**
      * Grille du jeu pour la partie interface
@@ -38,48 +40,39 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
     private Pane parentBateau;
 
     @FXML
-    private ImageView porteAvion;
+    private Button restartButton;
     @FXML
-    private ImageView croiseur;
-    @FXML
-    private ImageView contreTorpilleurs;
-    @FXML
-    private ImageView sousMarin;
-    @FXML
-    private ImageView torpilleur;
+    private Button readyButton;
 
     @FXML
     private Label rotationInfo;
 
-    private final List<Bateau> bateaux = new ArrayList<>();
     private boolean isKeyEventInitialize = false;
     private ImageView selectedBoat = null;
 
     private RotateType rotation = RotateType.HORIZONTAL;
+    private int nbPlacedBoat = 0;
 
-    @FXML
-    public void clickGrid(MouseEvent event) {
-        Node source = event.getPickResult().getIntersectedNode();
-        Integer colIndex = GridPane.getColumnIndex(source);
-        Integer rowIndex = GridPane.getRowIndex(source);
-
-        if(colIndex == null || rowIndex == null) return;
-
-        System.out.println(UIGrille.getCellBounds(colIndex, rowIndex));
-
-        System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
-    }
+    private Bataille bataille;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        GameApplication.getInstance().addListeners(this);
+        readyButton.setVisible(false);
+        restartButton.setVisible(false);
 
-        for (int i = 9 ; i >= 0 ; i--) {
-            for (int j = 9; j >= 0; j--) {
-                addPane(i, j);
+        for (int y = 0 ; y < 10 ; y++) {
+            for (int x = 0; x < 10; x++) {
+                addPane(x, y);
             }
         }
-        instantiateBoat();
+
+        Pane pane = (Pane)UIGrille.getChildren().get(10);
+        pane.setBackground(new Background(new BackgroundFill(Color.rgb(0, 255, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        bataille = GameApplication.getInstance().getBataille();
+        bataille.resetGrille();
+
+        Platform.runLater(this::instantiateBoat);
     }
 
     private void addPane(int colIndex, int rowIndex) {
@@ -117,27 +110,22 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         UIGrille.add(pane, colIndex, rowIndex);
     }
 
-    @Override
-    public void OnKeyPressed(String key) {
-        System.out.println("test" + key);
-    }
-
     /**
      * Fonction qui permet de faire apparaitre les différents bateaux présents dans le jeu
      */
     private void instantiateBoat() {
-        bateaux.add(new Bateau(BateauType.PorteAvion, 0, 0));
-        bateaux.add(new Bateau(BateauType.Croiseur, 0, 0));
-        bateaux.add(new Bateau(BateauType.ContreTorpilleurs, 0, 0));
-        bateaux.add(new Bateau(BateauType.SousMarin, 0, 0));
-        bateaux.add(new Bateau(BateauType.Torpilleur, 0, 0));
+        bataille.leftBateau.add(new Bateau(BateauType.PorteAvion, 0, 0));
+        bataille.leftBateau.add(new Bateau(BateauType.Croiseur, 0, 0));
+        bataille.leftBateau.add(new Bateau(BateauType.ContreTorpilleurs, 0, 0));
+        bataille.leftBateau.add(new Bateau(BateauType.SousMarin, 0, 0));
+        bataille.leftBateau.add(new Bateau(BateauType.Torpilleur, 0, 0));
 
-        for (int i = 0; i < bateaux.size(); i++) {
-            Bateau b = bateaux.get(i);
-            b.changeParent(parentBateau);
+        for (int i = 0; i < bataille.leftBateau.size(); i++) {
+            Bateau bateau = bataille.leftBateau.get(i);
+            bateau.changeParent(parentBateau);
 
-            b.getImage().setOnDragDetected(this::OnDragDetected);
-            b.getImage().setOnDragDone(this::OnDragDone);
+            bateau.getImage().setOnDragDetected(this::OnDragDetected);
+            bateau.getImage().setOnDragDone(this::OnDragDone);
         }
     }
 
@@ -148,8 +136,6 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         ImageView img = (ImageView)event.getSource();
         // Permet de rendre l'image "Invisible pour la souris lors du placement"
         img.setMouseTransparent(true);
-
-        img.setOnKeyPressed(this::OnKeyPressed);
 
         // Création du drag and drop
         Dragboard db = img.startDragAndDrop(TransferMode.ANY);
@@ -231,6 +217,30 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
                 System.out.println(event.getSceneY());
                 //bateau.placer(0, 0);
                 bateau.placer((int)event.getSceneX(), (int)event.getSceneY());
+
+                //Node source = event.getPickResult().getIntersectedNode();
+
+                System.out.println("[" + l + ":" + c + "]");
+                System.out.println(UIGrille.getColumnCount());
+
+                if(rotation == RotateType.VERTICAL) {
+                    System.out.println("vertical");
+                    for (int i = c; i > (c - bateau.size()); i--) {
+                        System.out.println("[" + l + " : " + i + "]");
+                        Pane pane = (Pane)UIGrille.getChildren().get(l * UIGrille.getColumnCount() + i);
+                        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
+                    }
+                } else {
+                    System.out.println("horizontal");
+                    for (int i = l; i < (l + bateau.size()); i++) {
+                        System.out.println("[" + i + " : " + c + "]");
+                        Pane pane = (Pane)UIGrille.getChildren().get(i * UIGrille.getColumnCount() + c);
+                        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
+                    }
+                }
+
+                nbPlacedBoat++;
+                CheckAllBoatsPlace();
             }
 
             success = true;
@@ -260,13 +270,30 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
         event.consume();
     }
 
-    private void OnKeyPressed(KeyEvent event) {
-        System.out.println("testzadzadzadazdzadza");
-
-        if (event.getCode() == KeyCode.R) {
-            System.out.println("RRRRRR");
-            //rotation = rotation == 2 ? 1 : 2;
+    /**
+     * Fonction pour vérifier si tous les bateaux sont placés
+     */
+    private void CheckAllBoatsPlace() {
+        if(nbPlacedBoat >= bataille.leftBateau.size()) {
+            readyButton.setVisible(true);
         }
+
+        if(nbPlacedBoat > 0) {
+            restartButton.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void OnReadyButton(ActionEvent event) throws IOException {
+        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+
+        GameUtils.ChangeScene(stage, FxmlType.GameScene, "Scène de jeu");
+    }
+    @FXML
+    private void OnRestartButton(ActionEvent event) throws IOException {
+        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+
+        GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
     }
 
     /**
@@ -297,7 +324,7 @@ public class BoatPlacement implements Initializable, EventKeyPressed {
     }
 
     private Bateau ImageToBateau(ImageView img) {
-        for(Bateau bateau : bateaux) {
+        for(Bateau bateau : bataille.leftBateau) {
             if(img == bateau.getImage())
             {
                 return bateau;

@@ -3,6 +3,9 @@ package com.example.bataillenavale_graphique;
 import Utils.BateauType;
 import Utils.GameUtils;
 import Utils.RotateType;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -25,6 +28,8 @@ public class Bateau {
     public int id() { return type.getIdBateau(); }
 
     public boolean place = false;
+    private int ligneGrid;
+    private int colonneGrid;
 
     // 1 => Horizontal || 2 => Vertical
     private RotateType rotate = RotateType.HORIZONTAL;
@@ -41,10 +46,15 @@ public class Bateau {
         placer(x, y);
     }
 
-    public void placer(int x, int y) {
-        img.setLayoutX(x);
-        img.setLayoutY(y);
+    public void placer(int l, int c) {
+        ligneGrid = l;
+        colonneGrid = c;
+        //img.setLayoutX(x);
+        //img.setLayoutY(y);
     }
+    public int getLigneGrid() { return ligneGrid; }
+    public int getColonneGrid() { return colonneGrid; }
+
     public void place(boolean isPlace) {
         place = isPlace;
     }
@@ -68,6 +78,9 @@ public class Bateau {
     }
 
     public void changeParent(Pane parent) {
+        parent.getChildren().add(img);
+    }
+    public void changeParent(Group parent) {
         parent.getChildren().add(img);
     }
 
