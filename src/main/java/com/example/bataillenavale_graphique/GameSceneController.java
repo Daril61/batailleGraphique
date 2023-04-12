@@ -23,6 +23,9 @@ public class GameSceneController implements Initializable {
 
     @FXML
     private GridPane rightGrid;
+    public GridPane getRightGrid() {
+        return rightGrid;
+    }
 
     @FXML
     private Pane root;
@@ -89,7 +92,7 @@ public class GameSceneController implements Initializable {
                         BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
             });
 
-            pane.setOnMouseClicked(e -> OnMouseClickCase(e, grille));
+            pane.setOnMouseClicked(e -> OnSelectNode(e, grille));
         }
 
         GridPane.setConstraints(pane, colIndex, rowIndex);
@@ -97,15 +100,28 @@ public class GameSceneController implements Initializable {
     }
 
     // Fonction quand on clique sur un pane
-    private void OnMouseClickCase(MouseEvent e, GridPane grille) {
+    @FXML
+    private void OnSelectNode(MouseEvent e, GridPane grille) {
+        // Si ce n'est pas le tour du joueur
+        if(!bataille.yourTurn) return;
+
         Node source = e.getPickResult().getIntersectedNode();
         Integer colIndex = GridPane.getColumnIndex(source);
         Integer rowIndex = GridPane.getRowIndex(source);
 
+        // Si on ne peut pax récupérer une ligne ou une colonne par rapport au clique
         if(colIndex == null || rowIndex == null) return;
 
         System.out.println(grille.getCellBounds(colIndex, rowIndex));
 
         System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
+        bataille.mouvement(bataille.grilleOrdi, colIndex, rowIndex, true);
+
+        if(bataille.vainqueur(bataille.grilleOrdi)) {
+            System.out.println("Victoire du joueur !");
+            return;
+        }
+
+        bataille.tourOrdinateur();
     }
 }

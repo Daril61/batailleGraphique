@@ -18,7 +18,7 @@ public class Bataille {
     /**
      * Grille qui contient la carte de l'ordinateur
      */
-    public static int[][] grilleOrdi = new int[10][10];
+    public int[][] grilleOrdi = new int[10][10];
     /**
      * Grille qui contient la carte du joueur
      */
@@ -33,6 +33,7 @@ public class Bataille {
     public static Random rand = new Random();
 
     private GameSceneController gsc;
+    public boolean yourTurn = false;
 
     /**
      * Fonction principale qui permet de lancer la bataille
@@ -49,38 +50,25 @@ public class Bataille {
     public void play(GameSceneController gsc) {
         this.gsc = gsc;
 
-        // Tant qu'il reste entre des bateaux dans les deux grilles alors on joue
-        while(!vainqueur(grilleJeu) && !vainqueur(grilleOrdi)) {
-            // Tour de l'ordinateur
-            int[] position = tirOrdinateur();
-            mouvement(grilleJeu, position[0], position[1]);
+        // On dit que c'est le tour du joueur
+        yourTurn = true;
+    }
 
-            // Vérification que l'ordinateur a gagné
-            if(vainqueur(grilleJeu)) {
-                System.out.println();
-                System.out.println("Victoire de l'ordinateur !");
-                System.out.println();
-                break;
-            }
+    /**
+     * Fonction pour faire jouer l'ordinateur
+     */
+    public void tourOrdinateur() {
+        yourTurn = false;
 
-            System.out.println();
-            AfficherGrille(grilleJeu);
-            // Tour du joueur
-            System.out.println("C'est à votre tour");
-            //position = demandePosition();
-            //mouvement(grilleOrdi, position[0], position[1]);
-            mouvement(grilleOrdi, 1, 1);
+        int[] position = tirOrdinateur();
+        mouvement(grilleJeu, position[0], position[1], false);
 
-            // Vérification que le joueur a gagné
-            if(vainqueur(grilleOrdi)) {
-                System.out.println();
-                System.out.println("Victoire du joueur !");
-                System.out.println();
-                break;
-            }
+        if(vainqueur(grilleJeu)) {
+            System.out.println("Victoire de l'ordinateur !");
+            return;
         }
 
-        System.out.println("Fin de l'exécution du programme !");
+        yourTurn = true;
     }
 
     /**
@@ -96,41 +84,6 @@ public class Bataille {
         return rand.nextInt(b-a) + a;
     }
 
-    /**
-     * Fonction qui demande à l'utilisateur, un numéro de ligne et un numéro de colonne pour faire une position
-     *
-     * @since 06/02/2023
-     *
-     * @return Un tableau d'entier composé de 2 valeurs (0 => numéro de ligne | 1 => numéro de colonne)
-     */
-    public static int[] demandePosition() {
-        Scanner scanner = new Scanner(System.in);
-
-        int l = -1;
-        while(l < 1 || l > 10) {
-            System.out.print("Entrer le numéro de ligne (1, 2, ..., 10): ");
-            if(scanner.hasNextInt())
-                l = scanner.nextInt();
-
-            scanner.nextLine();
-        }
-        // On retire 1 à la variable 'l' car on utilise de 0 à 9 et non de 1 à 10
-        l--;
-
-        int c = -1;
-        while(c < 0) {
-            System.out.print("Entrer le numéro de colonne (A, B, ..., J): ");
-
-            String strColonne = scanner.nextLine();
-            if(strColonne.length() > 0) {
-                char charColonne = strColonne.charAt(0);
-                c = Arrays.binarySearch(GameUtils.colonne, charColonne);
-            }
-        }
-
-        int[] position = new int[]{l, c};
-        return position;
-    }
 
     /**
      * Fonction pour ajouter un bateau à une grille
@@ -232,15 +185,20 @@ public class Bataille {
      * @param l Un numéro de ligne
      * @param c Un numéro de colonne
      */
-    public void mouvement(int[][] grille, int l, int c) {
-        Pane pane = (Pane)gsc.getLeftGrid().getChildren().get(l * gsc.getLeftGrid().getColumnCount() + c);
+    public void mouvement(int[][] grille, int l, int c, boolean right) {
+        Pane pane;
+
+        if(right)
+            pane = (Pane)gsc.getRightGrid().getChildren().get(l * gsc.getRightGrid().getColumnCount() + c);
+        else
+            pane = (Pane)gsc.getLeftGrid().getChildren().get(l * gsc.getLeftGrid().getColumnCount() + c);
 
         Bounds bounds = pane.getBoundsInLocal();
         double centerX = bounds.getMinX() + bounds.getWidth() / 2.0;
         double centerY = bounds.getMinY() + bounds.getHeight() / 2.0;
         Point2D centerInScene = pane.localToScene(centerX, centerY);
 
-        Bullet bullet = new Bullet(0, 0, (int)centerInScene.getX(), (int)centerInScene.getY(), gsc.getRoot());
+        new Bullet(0, 0, (int)centerInScene.getX(), (int)centerInScene.getY(), gsc.getRoot());
 
         // Vérification que la position touche de l'eau ou un bateau déjà touché
         if(grille[l][c] <= 0 || grille[l][c] >= 6) {
@@ -283,7 +241,7 @@ public class Bataille {
      *
      * @return Retourne vraie (true) si tous les bateaux de la grille ont été coulés
      */
-    public static boolean vainqueur(int[][] grille) {
+    public boolean vainqueur(int[][] grille) {
         for (int y = 0; y < grille.length; y++) {
             for (int x = 0; x < grille[y].length; x++) {
                 if(grille[y][x] > 0 && grille[y][x] < 6) {
