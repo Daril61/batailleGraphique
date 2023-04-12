@@ -5,10 +5,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -31,6 +33,8 @@ public class GameSceneController implements Initializable {
     private Pane root;
     public Pane getRoot() { return root; }
     private Bataille bataille;
+
+    private final static String waterURL = "src/main/resources/Images/water.png";
 
     /**
      * Fonction execute au démarrage de la scène
@@ -62,14 +66,14 @@ public class GameSceneController implements Initializable {
 
             for (int x = 0; x < bataille.grilleJeu.length; x++) {
                 for (int y = 0; y < bataille.grilleJeu[x].length; y++) {
-                    if(bataille.grilleJeu[x][y] > 0) {
+                    if (bataille.grilleJeu[x][y] > 0) {
                         Pane pane = (Pane) leftGrid.getChildren().get(y * leftGrid.getColumnCount() + x);
+
                         pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
                     }
                 }
             }
         }
-
         bataille.play(this);
     }
 
@@ -77,7 +81,12 @@ public class GameSceneController implements Initializable {
         Pane pane = new Pane();
         pane.setMinSize(56, 56);
 
-        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 255, 255, 0), CornerRadii.EMPTY, Insets.EMPTY)));
+        // Configuration du pane, avec l'ajout d'une image d'eau et un contour
+        File file = new File(waterURL);
+        BackgroundImage myBI= new BackgroundImage(new Image(file.toURI().toString(),32,32,false,true),
+                BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        pane.setBackground(new Background(myBI));
         pane.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 

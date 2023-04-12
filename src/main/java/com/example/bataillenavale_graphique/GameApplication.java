@@ -1,19 +1,12 @@
 package com.example.bataillenavale_graphique;
 
-import Utils.EventKeyPressed;
 import Utils.FxmlType;
 import Utils.GameType;
 import Utils.GameUtils;
 import javafx.application.Application;
-import javafx.event.Event;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Classe principal de l'application

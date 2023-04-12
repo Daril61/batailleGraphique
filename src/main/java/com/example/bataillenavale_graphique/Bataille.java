@@ -3,8 +3,11 @@ package com.example.bataillenavale_graphique;
 import Utils.GameUtils;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -122,7 +125,8 @@ public class Bataille {
      *
      * @since 06/02/2023
      */
-    public void initGrilleOrdi() {
+    public void
+    initGrilleOrdi() {
         // Numéro de ligne ( 0 - 9 )
         int l = randRange(0, 10);
         // Numéro de colonne ( 0 - 9 )
@@ -203,12 +207,29 @@ public class Bataille {
         // Vérification que la position touche de l'eau ou un bateau déjà touché
         if(grille[l][c] <= 0 || grille[l][c] >= 6) {
             System.out.println("[" + GameUtils.colonne[c] + " " + (l + 1) + "] À l’eau ");
+            // Vérification qu'il n'y est déjà pas une autre image dessus
+            if(grille[l][c] < 6) {
+                File fileCercle = new File("src/main/resources/Images/cercle.png");
+
+                Image cercleImg = new Image(fileCercle.toURI().toString(), 56, 56, false, false);
+                ImageView cercleImgView = new ImageView(cercleImg);
+
+                pane.getChildren().add(cercleImgView);
+            }
             return;
         }
 
         // Récupération de l'id du bateau
         int idBateau = grille[l][c];
         grille[l][c] = 6;
+
+        File fileCroix = new File("src/main/resources/Images/croix.png");
+
+        Image croixImg = new Image(fileCroix.toURI().toString(), 56, 56, false, false);
+        ImageView croixImgView = new ImageView(croixImg);
+
+        pane.getChildren().add(croixImgView);
+
         // Si le bateau est coulé alors on affiche Coulé sinon Touché
         if(couler(grille, idBateau)) {
             System.out.println("[" + GameUtils.colonne[c] + " " + (l + 1) + "] Coulé, il s'agissait d'un " + GameUtils.bateauxNom[idBateau-1]);
