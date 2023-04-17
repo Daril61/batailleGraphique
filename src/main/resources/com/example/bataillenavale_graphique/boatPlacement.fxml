@@ -61,9 +61,10 @@
                   </GridPane>
                   <VBox spacing="6.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#DoRotation" prefHeight="25.0" prefWidth="90.0" text="Rotation" />
-                        <Button fx:id="restartButton" mnemonicParsing="false" onAction="#OnRestartButton" prefHeight="25.0" text="Recommencer" />
-                        <Button fx:id="readyButton" mnemonicParsing="false" onAction="#OnReadyButton" prefHeight="25.0" prefWidth="90.0" text="Prêt" />
+                        <Button mnemonicParsing="false" onAction="#DoRotation" prefHeight="25.0" prefWidth="100.0" text="Rotation" />
+                        <Button layoutX="10.0" layoutY="41.0" mnemonicParsing="false" onAction="#OnRandomButton" prefHeight="25.0" prefWidth="100.0" text="Aléatoire" />
+                        <Button fx:id="restartButton" mnemonicParsing="false" onAction="#OnRestartButton" prefHeight="25.0" prefWidth="100.0" text="Recommencer" />
+                        <Button fx:id="readyButton" mnemonicParsing="false" onAction="#OnReadyButton" prefHeight="25.0" prefWidth="100.0" text="Prêt" />
                      </children>
                   </VBox>
                </children>

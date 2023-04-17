@@ -2,6 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -17,6 +20,15 @@
    <children>
       <VBox prefHeight="772.0" prefWidth="1205.0">
          <children>
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="Menu">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#Tricher" text="Tricher" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
             <HBox prefHeight="420.0" prefWidth="1205.0">
                <children>
                   <VBox prefHeight="539.0" prefWidth="600.0">
@@ -106,9 +118,9 @@
                   </VBox>
                </children>
             </HBox>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0">
+            <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="200.0" vvalue="1.0">
                <content>
-                  <VBox />
+                  <VBox fx:id="scrollPaneTextContainer" />
                </content>
             </ScrollPane>
          </children>

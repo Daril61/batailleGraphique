@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BackgroundImage;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -44,6 +45,9 @@ public class GameUtils {
             "Sous-marin",
             "Torpilleur"
     };
+
+    public final static String waterURL = "src/main/resources/Images/water.png";
+    public static BackgroundImage waterBackground;
 
     /**
      * Liste des colonnes, c'est-à-dire les lettres de la grille

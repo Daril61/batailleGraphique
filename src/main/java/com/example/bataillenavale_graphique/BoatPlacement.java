@@ -47,9 +47,6 @@ public class BoatPlacement implements Initializable {
     @FXML
     private Label rotationInfo;
 
-    private boolean isKeyEventInitialize = false;
-    private ImageView selectedBoat = null;
-
     private RotateType rotation = RotateType.HORIZONTAL;
     private int nbPlacedBoat = 0;
 
@@ -291,10 +288,39 @@ public class BoatPlacement implements Initializable {
     }
     @FXML
     private void OnRestartButton(ActionEvent event) throws IOException {
+        // On supprime les bateaux
+        bataille.leftBateau.clear();
+
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
         GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
     }
+    @FXML
+    private void OnRandomButton(ActionEvent event) {
+        bataille.resetGrille();
+        bataille.RdmInitGrid(bataille.grilleJeu);
+
+        for (Bateau b: bataille.leftBateau) {
+            b.place(true);
+        }
+
+        nbPlacedBoat = bataille.leftBateau.size();
+
+        for (int x = 0; x < bataille.grilleJeu.length; x++) {
+            for (int y = 0; y < bataille.grilleJeu[x].length; y++) {
+                Pane pane = (Pane) UIGrille.getChildren().get(x * UIGrille.getColumnCount() + y);
+
+                if (bataille.grilleJeu[x][y] > 0) {
+                    pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
+                } else {
+                    pane.setBackground(new Background(GameUtils.waterBackground));
+                }
+            }
+        }
+
+        CheckAllBoatsPlace();
+    }
+
 
     /**
      * Fonction pour récupérer les contours d'une cellule

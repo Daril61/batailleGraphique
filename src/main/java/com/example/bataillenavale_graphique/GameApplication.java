@@ -4,8 +4,14 @@ import Utils.FxmlType;
 import Utils.GameType;
 import Utils.GameUtils;
 import javafx.application.Application;
+import javafx.scene.image.Image;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -54,6 +60,12 @@ public class GameApplication extends Application {
         stage.setMaximized(true);
 
         stage.show();*/
+
+        // Récupération de l'image d'eau
+        File file = new File(GameUtils.waterURL);
+        GameUtils.waterBackground = new BackgroundImage(new Image(file.toURI().toString(),32,32,false,true),
+                BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
 
         GameUtils.ChangeScene(stage, FxmlType.Lobby, "Lobby");
     }

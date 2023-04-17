@@ -22,6 +22,8 @@ public class Bataille {
      * Grille qui contient la carte de l'ordinateur
      */
     public int[][] grilleOrdi = new int[10][10];
+    private final int[][] grilleMouvementOrdi = new int[10][10];
+
     /**
      * Grille qui contient la carte du joueur
      */
@@ -54,6 +56,7 @@ public class Bataille {
         this.gsc = gsc;
 
         // On dit que c'est le tour du joueur
+        gsc.AddConsoleLine("A votre tour");
         yourTurn = true;
     }
 
@@ -61,6 +64,7 @@ public class Bataille {
      * Fonction pour faire jouer l'ordinateur
      */
     public void tourOrdinateur() {
+        gsc.AddConsoleLine("Au tour de votre adversaire");
         yourTurn = false;
 
         int[] position = tirOrdinateur();
@@ -71,6 +75,7 @@ public class Bataille {
             return;
         }
 
+        gsc.AddConsoleLine("A votre tour");
         yourTurn = true;
     }
 
@@ -125,8 +130,11 @@ public class Bataille {
      *
      * @since 06/02/2023
      */
-    public void
-    initGrilleOrdi() {
+    private void initGrilleOrdi() {
+        RdmInitGrid(grilleOrdi);
+    }
+
+    public void RdmInitGrid(int[][] grille) {
         // Numéro de ligne ( 0 - 9 )
         int l = randRange(0, 10);
         // Numéro de colonne ( 0 - 9 )
@@ -141,8 +149,8 @@ public class Bataille {
             t = GameUtils.bateauxTaille[idBateau];
 
             // Si on peut placer le bateau
-            if(GameUtils.posOk(grilleOrdi, l, c, d, t)) {
-                ajouterBateau(grilleOrdi, l, c, d, t, (idBateau+1));
+            if(GameUtils.posOk(grille, l, c, d, t)) {
+                ajouterBateau(grille, l, c, d, t, (idBateau+1));
                 idBateau++;
 
             } else {
@@ -192,10 +200,15 @@ public class Bataille {
     public void mouvement(int[][] grille, int l, int c, boolean right) {
         Pane pane;
 
+        System.out.println("Ligne " + l);
+        System.out.println("Colonne " + c);
+
+        System.out.println(c * gsc.getRightGrid().getColumnCount() + l);
+
         if(right)
             pane = (Pane)gsc.getRightGrid().getChildren().get(l * gsc.getRightGrid().getColumnCount() + c);
         else
-            pane = (Pane)gsc.getLeftGrid().getChildren().get(l * gsc.getLeftGrid().getColumnCount() + c);
+            pane = (Pane)gsc.getLeftGrid().getChildren().get(c * gsc.getLeftGrid().getColumnCount() + l);
 
         Bounds bounds = pane.getBoundsInLocal();
         double centerX = bounds.getMinX() + bounds.getWidth() / 2.0;
@@ -206,6 +219,8 @@ public class Bataille {
 
         // Vérification que la position touche de l'eau ou un bateau déjà touché
         if(grille[l][c] <= 0 || grille[l][c] >= 6) {
+            gsc.AddConsoleLine("[" + GameUtils.colonne[c] + " " + (l + 1) + "] À l’eau ");
+            gsc.AddConsoleLine("");
             System.out.println("[" + GameUtils.colonne[c] + " " + (l + 1) + "] À l’eau ");
             // Vérification qu'il n'y est déjà pas une autre image dessus
             if(grille[l][c] < 6) {
@@ -232,10 +247,14 @@ public class Bataille {
 
         // Si le bateau est coulé alors on affiche Coulé sinon Touché
         if(couler(grille, idBateau)) {
+            gsc.AddConsoleLine("[" + GameUtils.colonne[c] + " " + (l + 1) + "] Coulé, il s'agissait d'un " + GameUtils.bateauxNom[idBateau-1]);
             System.out.println("[" + GameUtils.colonne[c] + " " + (l + 1) + "] Coulé, il s'agissait d'un " + GameUtils.bateauxNom[idBateau-1]);
         } else {
+            gsc.AddConsoleLine("[" + GameUtils.colonne[c] + " " + (l + 1) + "] Touché, il s'agit d'un " + GameUtils.bateauxNom[idBateau-1]);
             System.out.println("[" + GameUtils.colonne[c] + " " + (l + 1) + "] Touché, il s'agit d'un " + GameUtils.bateauxNom[idBateau-1]);
         }
+
+        gsc.AddConsoleLine("");
     }
 
     /**
@@ -245,11 +264,18 @@ public class Bataille {
      *
      * @return Un tableau d'entier composé de 2 valeurs (0 => numéro de ligne | 1 => numéro de colonne)
      */
-    public static int[] tirOrdinateur() {
-        int l = randRange(0, 10);
-        int c = randRange(0, 10);
+    public int[] tirOrdinateur() {
+        int[] position;
 
-        int[] position = new int[]{l, c};
+        do {
+            int l = randRange(0, 10);
+            int c = randRange(0, 10);
+
+            position = new int[]{l, c};
+        } while(grilleMouvementOrdi[position[0]][position[1]] == 1);
+
+        grilleMouvementOrdi[position[0]][position[1]] = 1;
+
         return position;
     }
 
