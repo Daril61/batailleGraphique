@@ -7,49 +7,87 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Classe permettant de gérer la scène de jeu
+ *
+ * @author Romain Veydarier
+ * @since 20/04/2023
+ */
 public class GameSceneController implements Initializable {
 
+    /**
+     * Variable qui contient la grille gauche
+     */
     @FXML
     private GridPane leftGrid;
-
+    /**
+     * Fonction pour récupérer la grille de gauche
+     * @return La grille gauche
+     */
     public GridPane getLeftGrid() {
         return leftGrid;
     }
 
+    /**
+     * Variable qui contient la grille droite
+     */
     @FXML
     private GridPane rightGrid;
+    /**
+     * Fonction pour récupérer la grille de droite
+     * @return La grille droite
+     */
     public GridPane getRightGrid() {
         return rightGrid;
     }
 
+    /**
+     * Variable qui contient l'élément le plus haut dans la hiérarchie (ROOT)
+     */
     @FXML
     private Pane root;
+    /**
+     * Fonction pour récupérer la variable root
+     * @return Une référence vers la variable root
+     */
     public Pane getRoot() { return root; }
 
+    /**
+     * Variable qui contient la barre pour dérouler la console
+     */
     @FXML
     private ScrollPane scrollPane;
+    /**
+     * Variable qui contient chaque ligne de texte pour les mettre en vertical
+     */
     @FXML
     private VBox scrollPaneTextContainer;
 
+    /**
+     * Référence vers la classe Bataille
+     *
+     * @see Bataille
+     */
     private Bataille bataille;
 
+    /**
+     * Variable pour savoir si la triche est activé ou non
+     */
     private boolean hasTricheEnabled = false;
 
     /**
      * Fonction execute au démarrage de la scène
      *
-     * @param url
-     * @param resourceBundle
+     * @param url Variable URL donné par la fonction initialize
+     * @param resourceBundle Variable resourceBundle donné par la fonction initialize
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

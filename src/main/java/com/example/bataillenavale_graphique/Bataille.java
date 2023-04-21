@@ -52,6 +52,10 @@ public class Bataille {
         AfficherGrille(grilleJeu);
     }
 
+    /**
+     * Fonction pour initialiser la bataille et commencer à joueur
+     * @param gsc Référence vers le controller de la scène de jeu
+     */
     public void play(GameSceneController gsc) {
         this.gsc = gsc;
 
@@ -91,7 +95,6 @@ public class Bataille {
     public static int randRange(int a, int b) {
         return rand.nextInt(b-a) + a;
     }
-
 
     /**
      * Fonction pour ajouter un bateau à une grille
@@ -171,7 +174,7 @@ public class Bataille {
      *
      * @return Retourne vraie (true) si le bateau est coulé (qu'il n'est plus présent dans la grille)
      */
-    public static boolean couler(int[][] grille, int idBateau) {
+    public boolean couler(int[][] grille, int idBateau) {
         if(idBateau < 1 || idBateau > 5) {
             System.out.println("Attention, la variable idBateau n'est pas comprise entre 1 et 5");
             return true;

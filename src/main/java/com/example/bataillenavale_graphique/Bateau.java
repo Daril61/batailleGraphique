@@ -18,7 +18,7 @@ import javafx.scene.layout.Pane;
  */
 public class Bateau {
 
-    private final ImageView img;
+    private ImageView img;
 
     public int x() { return (int)img.getX(); }
     public int y() { return (int)img.getY(); }
@@ -26,6 +26,8 @@ public class Bateau {
     private final BateauType type;
     public int size() { return type.getTailleBateau(); }
     public int id() { return type.getIdBateau(); }
+
+    private int[] nodeStart;
 
     public boolean place = false;
     private int ligneGrid;
@@ -71,7 +73,10 @@ public class Bateau {
             break;
             case VERTICAL:
             {
-                img.setRotate(90);
+                // Changement de l'image pour celle en vertical
+                Image image = new Image(type.getImageURLVertical());
+                System.out.println("URL : " + type.getImageURLVertical() + " | taille image : " + image.getWidth() + "x" + image.getHeight());
+                img = new ImageView(image);
             }
             break;
         }

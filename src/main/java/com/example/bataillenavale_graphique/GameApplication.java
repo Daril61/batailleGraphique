@@ -15,21 +15,35 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Classe principal de l'application
+ * Classe principale de l'application
  *
  * @author Romain Veydarier
  * @since 16/03/2023
  */
 public class GameApplication extends Application {
 
+    /**
+     * Variable pour faire un SINGLETON
+     */
     private static GameApplication instance;
 
+    /**
+     * Fonction pour récupérer la classe Application
+     * @return Une référence vers la variable instance
+     */
     public static GameApplication getInstance() {
         return instance;
     }
 
+    /**
+     * Variable cerveau pour le jeu
+     */
     private Bataille bataille = null;
 
+    /**
+     * Fonction pour récupérer la bataille
+     * @return Une référence vers la variable bataille
+     */
     public Bataille getBataille() {
         return bataille;
     }

@@ -29,29 +29,61 @@ import java.util.*;
 public class BoatPlacement implements Initializable {
 
     /**
-     * Grille du jeu pour la partie interface
+     * Grille où le joueur doit placer les bateaux
      */
     @FXML
     private GridPane UIGrille;
 
+    /**
+     * Variable qui contient l'élément le plus haut dans la hiérarchie (ROOT)
+     */
     @FXML
     private Pane root;
+    /**
+     * Variable qui contient le parent des bateaux qui ne sont pas placé
+     */
     @FXML
     private Pane parentBateau;
 
+    /**
+     * Variable qui contient le bouton pour réinitialiser les bateaux
+     */
     @FXML
     private Button restartButton;
+    /**
+     * Variable qui contient le bouton pour commencer la partie
+     */
     @FXML
     private Button readyButton;
 
+    /**
+     * Variable qui contient le texte pour indiquer au joueur l'état de la rotation
+     */
     @FXML
     private Label rotationInfo;
 
+    /**
+     * Variable qui donne l'état de la rotation
+     */
     private RotateType rotation = RotateType.HORIZONTAL;
+    /**
+     * Variable qui indique le nombre de bateaux placés
+     */
     private int nbPlacedBoat = 0;
 
+    /**
+     * Référence vers la classe Bataille
+     *
+     * @see Bataille
+     */
     private Bataille bataille;
 
+    /**
+     * Fonction execute au démarrage de la scène
+     *
+     * @param url Variable URL donné par la fonction initialize
+     * @param resourceBundle Variable resourceBundle donné par la fonction initialize
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         readyButton.setVisible(false);
@@ -172,33 +204,40 @@ public class BoatPlacement implements Initializable {
     }
 
     private void OnDragDropped(DragEvent event, int l, int c) {
-        System.out.println("onDragDropped");
-
+        // Récupération de l'évent de drag and drop
         Dragboard db = event.getDragboard();
 
         // Récupération de l'image
         ImageView img = (ImageView)event.getGestureSource();
 
         boolean success = false;
+        // Si il y a un texte à l'intérieur
         if (db.hasString()) {
+            // On récupère la taille du bateau à l'aide du texte à l'intérieur de l'évent de drag and drop
             int tailleBateau = Integer.parseInt(db.getString());
+            // Récupération de l'instance de la classe bataille
             Bataille bataille = GameApplication.getInstance().getBataille();
 
             // Vérification que le bateau rentre dans la case sélectionnée
             if(GameUtils.posOk(bataille.grilleJeu, l, c, rotation.getRotate(), tailleBateau)) {
-                System.out.println("test");
-
+                // Récupération du bateau posé avec l'image que le joueur a sélectionné
                 Bateau bateau = ImageToBateau(img);
 
+                // Si il n'y a pas de bateau
                 assert bateau != null;
-                bateau.place(true);
-                System.out.println(rotation.getRotate());
-                bataille.ajouterBateau(bataille.grilleJeu, l, c, rotation.getRotate(), bateau.size(), bateau.id());
-                bataille.AfficherGrille(bataille.grilleJeu);
 
-                // Changement du parent du bateau pour pouvoir le placer librement dans la carte
+                // Changement du parent du bateau pour pouvoir le placer librement dans la scène
                 parentBateau.getChildren().remove(img);
                 root.getChildren().add(img);
+
+                // On indique au bateau qu'il est posé
+                bateau.place(true);
+
+                // Ajout du bateau dans la grille (BACKEND)
+                bataille.ajouterBateau(bataille.grilleJeu, l, c, rotation.getRotate(), bateau.size(), bateau.id());
+
+                // Ajout du bateau dans la grille (FRONTEND)
+                GetCoo
 
                 /*Pane pane = (Pane)(UIGrille.getChildren().get(7 * l + 11 * c));
                 System.out.println(c * 9 + l);
@@ -213,7 +252,7 @@ public class BoatPlacement implements Initializable {
                 System.out.println(event.getSceneX());
                 System.out.println(event.getSceneY());
                 //bateau.placer(0, 0);
-                bateau.placer((int)event.getSceneX(), (int)event.getSceneY());
+                //bateau.placer((int)event.getSceneX(), (int)event.getSceneY());
 
                 //Node source = event.getPickResult().getIntersectedNode();
 

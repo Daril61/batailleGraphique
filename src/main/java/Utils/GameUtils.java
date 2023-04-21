@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BackgroundImage;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -46,7 +47,13 @@ public class GameUtils {
             "Torpilleur"
     };
 
+    /**
+     * Variable qui contient le chemin vers l'image de l'eau
+     */
     public final static String waterURL = "src/main/resources/Images/water.png";
+    /**
+     * Variable qui contient le l'arrière-plan de l'eau
+     */
     public static BackgroundImage waterBackground;
 
     /**
@@ -74,6 +81,8 @@ public class GameUtils {
 
         // Création de la nouvelle scène
         Scene scene = new Scene(root);
+        scene.setFill(Color.rgb(105, 102, 101));
+
         stage.setScene(scene);
 
         stage.setTitle(windowName);
