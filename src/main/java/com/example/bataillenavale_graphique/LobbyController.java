@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
@@ -35,15 +36,17 @@ public class LobbyController {
     }
 
     /**
-     * Fonction qui permet de lancer le jeu en mode multijoueur (Socket)
+     * Fonction qui permet de lancer le jeu en mode multijoueur (Socket) NON FONCTIONNELLE
      * @param event Variable événement à l'appuie du bouton
      *
      * @since 15/03/2023
      */
     @FXML
     protected void MultiplayerButton(ActionEvent event) {
-        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        Button button = (Button)event.getSource();
+        Stage stage = (Stage)button.getScene().getWindow();
 
+        button.setDisable(true);
     }
 
     /**

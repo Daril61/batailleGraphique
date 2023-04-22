@@ -72,13 +72,14 @@
          </children>
       </VBox>
       <MenuBar prefHeight="25.0" prefWidth="800.0">
-        <menus>
-          <Menu mnemonicParsing="false" text="Jeu">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Recommencer" />
-            </items>
-          </Menu>
-        </menus>
+         <menus>
+            <Menu mnemonicParsing="false" text="Menu">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#OnRestartButton" text="Redémarrer" />
+                  <MenuItem mnemonicParsing="false" onAction="#Quitter" text="Quitter" />
+               </items>
+            </Menu>
+         </menus>
       </MenuBar>
    </children>
 </Pane>

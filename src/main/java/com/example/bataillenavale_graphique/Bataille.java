@@ -1,10 +1,13 @@
 package com.example.bataillenavale_graphique;
 
+import Utils.BateauType;
 import Utils.GameUtils;
+import Utils.RotateType;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import java.io.File;
@@ -22,6 +25,9 @@ public class Bataille {
      * Grille qui contient la carte de l'ordinateur
      */
     public int[][] grilleOrdi = new int[10][10];
+    /**
+     * Grille de tous les mouvements que l'ordinateur à fait
+     */
     private final int[][] grilleMouvementOrdi = new int[10][10];
 
     /**
@@ -29,7 +35,13 @@ public class Bataille {
      */
     public int[][] grilleJeu = new int[10][10];
 
+    /**
+     * Liste des bateaux de la grille de gauche
+     */
     public List<Bateau> leftBateau = new ArrayList<>();
+    /**
+     * Liste des bateaux de la grille de droite
+     */
     public List<Bateau> rightBateau = new ArrayList<>();
 
     /**
@@ -37,20 +49,16 @@ public class Bataille {
      */
     public static Random rand = new Random();
 
-    private GameSceneController gsc;
-    public boolean yourTurn = false;
-
     /**
-     * Fonction principale qui permet de lancer la bataille
+     * Variable pour faire le lien avec le controlleur de la scène
      *
-     * @since 07/02/2023
+     * @see GameSceneController
      */
-    public Bataille() {
-        // Initialisation des 2 grilles
-        initGrilleOrdi();
-        //initGrilleJeu();
-        AfficherGrille(grilleJeu);
-    }
+    private GameSceneController gsc;
+    /**
+     * Variable qui permet de savoir si c'est le tour du joueur ou non
+     */
+    public boolean yourTurn = false;
 
     /**
      * Fonction pour initialiser la bataille et commencer à joueur
@@ -58,6 +66,9 @@ public class Bataille {
      */
     public void play(GameSceneController gsc) {
         this.gsc = gsc;
+
+        // Génération de la grille de l'ia
+        initGrilleOrdi();
 
         // On dit que c'est le tour du joueur
         gsc.AddConsoleLine("A votre tour");
@@ -75,7 +86,7 @@ public class Bataille {
         mouvement(grilleJeu, position[0], position[1], false);
 
         if(vainqueur(grilleJeu)) {
-            System.out.println("Victoire de l'ordinateur !");
+            gsc.AddConsoleLine("Victoire de l'ordinateur !");
             return;
         }
 
@@ -129,15 +140,49 @@ public class Bataille {
     }
 
     /**
+     * Fonction pour réinitialiser la classe bataille
+     */
+    public void reset() {
+        grilleJeu = new int[10][10];
+        grilleOrdi = new int[10][10];
+
+        leftBateau = new ArrayList<>();
+        rightBateau = new ArrayList<>();
+    }
+
+    /**
      * Fonction pour initialiser la grille de l'ordinateur avec la mise en place des 5 bateauxTaille sur sa grille
      *
      * @since 06/02/2023
      */
     private void initGrilleOrdi() {
-        RdmInitGrid(grilleOrdi);
+        rightBateau.add(new Bateau(BateauType.PorteAvion));
+        rightBateau.add(new Bateau(BateauType.Croiseur));
+        rightBateau.add(new Bateau(BateauType.ContreTorpilleurs));
+        rightBateau.add(new Bateau(BateauType.SousMarin));
+        rightBateau.add(new Bateau(BateauType.Torpilleur));
+
+        for (Bateau bateau : rightBateau) {
+            bateau.changeParent(gsc.getRoot());
+        }
+
+        rdmInitGrid(grilleOrdi, rightBateau, gsc.getRoot(), gsc.getRoot(), gsc.getRightGrid(), true);
+
+        gsc.Tricher(false);
+
+        AfficherGrille(grilleOrdi);
     }
 
-    public void RdmInitGrid(int[][] grille) {
+    /**
+     * Fonction pour générer aléatoirement une nouvelle grille
+     * @param grille La grille où l'on place les bateaux
+     * @param bateaux La liste des bateaux à poser
+     * @param parentBateau Le parent des bateaux
+     * @param root Le nouveau parent des bateux
+     * @param gridPane La grille UI
+     * @param invertCL Inverse les colonnes et ligne
+     */
+    public void rdmInitGrid(int[][] grille, final List<Bateau> bateaux, Pane parentBateau, Pane root, GridPane gridPane, boolean invertCL) {
         // Numéro de ligne ( 0 - 9 )
         int l = randRange(0, 10);
         // Numéro de colonne ( 0 - 9 )
@@ -146,16 +191,47 @@ public class Bataille {
         int d = randRange(1, 3);
 
         int idBateau = 0;
-        int t;
+        Bateau b;
 
-        while(idBateau < GameUtils.bateauxTaille.length) {
-            t = GameUtils.bateauxTaille[idBateau];
+        while(idBateau < bateaux.size()) {
+            // Récupération du bateau que l'on veut placer
+            b = bateaux.get(idBateau);
 
             // Si on peut placer le bateau
-            if(GameUtils.posOk(grille, l, c, d, t)) {
-                ajouterBateau(grille, l, c, d, t, (idBateau+1));
-                idBateau++;
+            if(GameUtils.posOk(grille, l, c, d, b.size())) {
+                // Changement du parent du bateau pour pouvoir le placer librement dans la scène
+                if(parentBateau != root) {
+                    parentBateau.getChildren().remove(b.getImage());
+                }
 
+                // On indique au bateau qu'il est posé
+                b.place(true);
+
+                // Ajout du bateau dans la grille (BACKEND)
+                ajouterBateau(grille, l, c, d, b.size(), b.id());
+
+                RotateType rotation = d == 1 ? RotateType.VERTICAL : RotateType.HORIZONTAL;
+
+                // Modification de la rotation
+                b.changeRotate(rotation);
+
+                // Changement de parent
+                root.getChildren().add(b.getImage());
+
+                // Ajout du bateau dans la grille (FRONTEND)
+                if(invertCL) {
+                    if (rotation == RotateType.VERTICAL)
+                        b.placer(c, l - b.size() + 1, gridPane);
+                    else
+                        b.placer(c, l, gridPane);
+                } else {
+                    if (rotation == RotateType.VERTICAL)
+                        b.placer(l, c - b.size() + 1, gridPane);
+                    else
+                        b.placer(l, c, gridPane);
+                }
+
+                idBateau++;
             } else {
                 l = randRange(0, 10);
                 c = randRange(0, 10);
@@ -232,6 +308,8 @@ public class Bataille {
                 Image cercleImg = new Image(fileCercle.toURI().toString(), 56, 56, false, false);
                 ImageView cercleImgView = new ImageView(cercleImg);
 
+                cercleImgView.toFront();
+
                 pane.getChildren().add(cercleImgView);
             }
             return;
@@ -245,6 +323,7 @@ public class Bataille {
 
         Image croixImg = new Image(fileCroix.toURI().toString(), 56, 56, false, false);
         ImageView croixImgView = new ImageView(croixImg);
+        croixImgView.toFront();
 
         pane.getChildren().add(croixImgView);
 

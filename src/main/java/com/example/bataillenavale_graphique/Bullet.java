@@ -12,21 +12,43 @@ import javafx.util.Duration;
 
 import java.io.File;
 
+/**
+ * Classe qui nous permet d'avoir des boulets dans le jeu
+ *
+ * @author Romain Veydarier
+ * @since 18/04/2023
+ */
 public class Bullet {
 
-    private int startX;
-    private int startY;
+    /**
+     * Position X vers laquelle le boulet doit aller
+     */
+    private final int endX;
+    /**
+     * Position Y vers laquelle le boulet doit aller
+     */
+    private final int endY;
 
-    private int endX;
-    private int endY;
+    /**
+     * Image du boulet
+     */
+    private final ImageView img;
+    /**
+     * Parent du boulet
+     */
+    private final Pane parent;
 
-    private ImageView img;
-    private Pane parent;
-
+    /**
+     * Constructeur de la classe
+     * @param startX Position X de départ
+     * @param startY Position Y de départ
+     * @param endX Position X d'arrivée
+     * @param endY Position Y d'arrivée
+     * @param pane Parent du boulet
+     */
     public Bullet(int startX, int startY, int endX, int endY, Pane pane) {
         this.parent = pane;
-        this.startX = startX;
-        this.startY = startY;
+
         this.endX = endX;
         this.endY = endY;
 
@@ -47,6 +69,9 @@ public class Bullet {
         startAnimation();
     }
 
+    /**
+     * Fonction qui s'occupe de faire l'animation du boulet
+     */
     private void startAnimation() {
 
         Timeline timeline = new Timeline();

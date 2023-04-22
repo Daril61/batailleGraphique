@@ -1,17 +1,19 @@
 package com.example.bataillenavale_graphique;
 
+import Utils.FxmlType;
 import Utils.GameUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -110,18 +112,8 @@ public class GameSceneController implements Initializable {
         for (int i = 0; i < bataille.leftBateau.size(); i++) {
             Bateau b = bataille.leftBateau.get(i);
             b.changeParent(root);
-
-            for (int x = 0; x < bataille.grilleJeu.length; x++) {
-                for (int y = 0; y < bataille.grilleJeu[x].length; y++) {
-                    if (bataille.grilleJeu[x][y] > 0) {
-                        Pane pane = (Pane) leftGrid.getChildren().get(y * leftGrid.getColumnCount() + x);
-
-                        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                }
-            }
+            b.placer(-1, -1, leftGrid);
         }
-
 
         bataille.play(this);
     }
@@ -182,7 +174,7 @@ public class GameSceneController implements Initializable {
         bataille.mouvement(bataille.grilleOrdi, colIndex, rowIndex, true);
 
         if(bataille.vainqueur(bataille.grilleOrdi)) {
-            System.out.println("Victoire du joueur !");
+            AddConsoleLine("Victoire du joueur !");
             return;
         }
 
@@ -196,18 +188,41 @@ public class GameSceneController implements Initializable {
     private void Tricher() {
         hasTricheEnabled = !hasTricheEnabled;
 
-        for (int x = 0; x < bataille.grilleOrdi.length; x++) {
-            for (int y = 0; y < bataille.grilleOrdi[x].length; y++) {
-                if (bataille.grilleOrdi[x][y] > 0) {
-                    Pane pane = (Pane) rightGrid.getChildren().get(x * rightGrid.getColumnCount() + y);
-
-                    if(hasTricheEnabled)
-                        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
-                    else
-                        pane.setBackground(new Background(GameUtils.waterBackground));
-                }
-            }
+        for(Bateau b : bataille.rightBateau) {
+            b.getImage().setVisible(hasTricheEnabled);
         }
+    }
+    /**
+     * Fonction qui permet de forcer le changement de l'état de la triche
+     */
+    public void Tricher(boolean state) {
+        hasTricheEnabled = state;
+
+        for(Bateau b : bataille.rightBateau) {
+            b.getImage().setVisible(hasTricheEnabled);
+        }
+    }
+
+    /**
+     * Fonction pour redémarrer la partie (Retour à la scène de placement de bateau)
+     * @throws IOException S'il y a un problème lors du chargement d'une scène
+     */
+    @FXML
+    private void Redemarrer() throws IOException {
+        Stage stage = (Stage) root.getScene().getWindow();
+
+        GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
+    }
+
+    /**
+     * Fonction pour quitter, (Retour au menu principal)
+     * @throws IOException S'il y a un problème lors du chargement d'une scène
+     */
+    @FXML
+    private void Quitter() throws IOException {
+        Stage stage = (Stage) root.getScene().getWindow();
+
+        GameUtils.ChangeScene(stage, FxmlType.Lobby, "Menu Principal");
     }
 
     /**

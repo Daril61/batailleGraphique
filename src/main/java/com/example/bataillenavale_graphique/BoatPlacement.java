@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -95,25 +97,24 @@ public class BoatPlacement implements Initializable {
             }
         }
 
-        Pane pane = (Pane)UIGrille.getChildren().get(10);
-        pane.setBackground(new Background(new BackgroundFill(Color.rgb(0, 255, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
-
+        // Récupération de la bataille
         bataille = GameApplication.getInstance().getBataille();
-        bataille.resetGrille();
+        bataille.reset();
 
         Platform.runLater(this::instantiateBoat);
     }
 
+    /**
+     * Fonction qui permet d'ajouter un pane à la grille
+     * @param colIndex Numéro de colonne
+     * @param rowIndex Numéro de ligne
+     */
     private void addPane(int colIndex, int rowIndex) {
         Pane pane = new Pane();
         pane.setMinSize(60, 60);
-        Random rand = new Random();
 
-        int red = rand.nextInt(255);
-        int green = rand.nextInt(255);
-        int blue = rand.nextInt(255);
-
-        pane.setBackground(new Background(new BackgroundFill(Color.rgb(red, green, blue, 0), CornerRadii.EMPTY, Insets.EMPTY)));
+        // Ajout du background d'eau
+        pane.setBackground(new Background(GameUtils.waterBackground));
         pane.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
@@ -143,11 +144,11 @@ public class BoatPlacement implements Initializable {
      * Fonction qui permet de faire apparaitre les différents bateaux présents dans le jeu
      */
     private void instantiateBoat() {
-        bataille.leftBateau.add(new Bateau(BateauType.PorteAvion, 0, 0));
-        bataille.leftBateau.add(new Bateau(BateauType.Croiseur, 0, 0));
-        bataille.leftBateau.add(new Bateau(BateauType.ContreTorpilleurs, 0, 0));
-        bataille.leftBateau.add(new Bateau(BateauType.SousMarin, 0, 0));
-        bataille.leftBateau.add(new Bateau(BateauType.Torpilleur, 0, 0));
+        bataille.leftBateau.add(new Bateau(BateauType.PorteAvion));
+        bataille.leftBateau.add(new Bateau(BateauType.Croiseur));
+        bataille.leftBateau.add(new Bateau(BateauType.ContreTorpilleurs));
+        bataille.leftBateau.add(new Bateau(BateauType.SousMarin));
+        bataille.leftBateau.add(new Bateau(BateauType.Torpilleur));
 
         for (int i = 0; i < bataille.leftBateau.size(); i++) {
             Bateau bateau = bataille.leftBateau.get(i);
@@ -158,6 +159,10 @@ public class BoatPlacement implements Initializable {
         }
     }
 
+    /**
+     * Fonction exécutée quand on commence un drag and drop
+     * @param event Evenement de drag and drop
+     */
     private void OnDragDetected(MouseEvent event) {
         System.out.println(event.getScreenX() + " - " + event.getScreenY());
 
@@ -181,6 +186,10 @@ public class BoatPlacement implements Initializable {
         event.consume();
     }
 
+    /**
+     * Fonction exécutée quand on passe par-dessus une case de la grille de drag and drop
+     * @param event Evenement de drag and drop
+     */
     private void OnDragOver(DragEvent event, Pane pane) {
         Dragboard db = event.getDragboard();
 
@@ -196,6 +205,10 @@ public class BoatPlacement implements Initializable {
         event.consume();
     }
 
+    /**
+     * Fonction exécutée quand on sort de la grille de drag and drop
+     * @param event Evenement de drag and drop
+     */
     private void OnDragExited(DragEvent event, Pane pane) {
         pane.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -203,6 +216,10 @@ public class BoatPlacement implements Initializable {
         event.consume();
     }
 
+    /**
+     * Fonction exécutée quand on termine le drag and drop sur l'objet ou l'on a posé l'objet
+     * @param event Evenement de drag and drop
+     */
     private void OnDragDropped(DragEvent event, int l, int c) {
         // Récupération de l'évent de drag and drop
         Dragboard db = event.getDragboard();
@@ -226,54 +243,23 @@ public class BoatPlacement implements Initializable {
                 // Si il n'y a pas de bateau
                 assert bateau != null;
 
-                // Changement du parent du bateau pour pouvoir le placer librement dans la scène
-                parentBateau.getChildren().remove(img);
-                root.getChildren().add(img);
-
                 // On indique au bateau qu'il est posé
                 bateau.place(true);
 
                 // Ajout du bateau dans la grille (BACKEND)
                 bataille.ajouterBateau(bataille.grilleJeu, l, c, rotation.getRotate(), bateau.size(), bateau.id());
 
-                // Ajout du bateau dans la grille (FRONTEND)
-                GetCoo
-
-                /*Pane pane = (Pane)(UIGrille.getChildren().get(7 * l + 11 * c));
-                System.out.println(c * 9 + l);
-                pane.getChildren().add(img);*/
-
                 // Modification de la rotation
                 bateau.changeRotate(rotation);
 
+                parentBateau.getChildren().remove(img);
+                root.getChildren().add(bateau.getImage());
 
-                Bounds b = GetBounds(event);
-
-                System.out.println(event.getSceneX());
-                System.out.println(event.getSceneY());
-                //bateau.placer(0, 0);
-                //bateau.placer((int)event.getSceneX(), (int)event.getSceneY());
-
-                //Node source = event.getPickResult().getIntersectedNode();
-
-                System.out.println("[" + l + ":" + c + "]");
-                System.out.println(UIGrille.getColumnCount());
-
-                if(rotation == RotateType.VERTICAL) {
-                    System.out.println("vertical");
-                    for (int i = c; i > (c - bateau.size()); i--) {
-                        System.out.println("[" + l + " : " + i + "]");
-                        Pane pane = (Pane)UIGrille.getChildren().get(l * UIGrille.getColumnCount() + i);
-                        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                } else {
-                    System.out.println("horizontal");
-                    for (int i = l; i < (l + bateau.size()); i++) {
-                        System.out.println("[" + i + " : " + c + "]");
-                        Pane pane = (Pane)UIGrille.getChildren().get(i * UIGrille.getColumnCount() + c);
-                        pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                }
+                // Ajout du bateau dans la grille (FRONTEND)
+                if(rotation == RotateType.VERTICAL)
+                    bateau.placer(l, c-bateau.size()+1, UIGrille);
+                else
+                    bateau.placer(l, c, UIGrille);
 
                 nbPlacedBoat++;
                 CheckAllBoatsPlace();
@@ -287,9 +273,14 @@ public class BoatPlacement implements Initializable {
         event.consume();
     }
 
+    /**
+     * Fonction exécutée quand on termine le drag and drop sur l'objet que l'on a drag and drop
+     * @param event Evenement de drag and drop
+     */
     private void OnDragDone(DragEvent event) {
         // Récupération de l'image
         ImageView img = (ImageView)event.getGestureSource();
+        img.toFront();
         Bateau bateau = ImageToBateau(img);
         assert bateau != null;
 
@@ -319,12 +310,21 @@ public class BoatPlacement implements Initializable {
         }
     }
 
+    /**
+     * Fonction liée au bouton prêt présent sur la scène pour quand le joueur est prêt
+     * @param event Evenement de clique sur le bouton
+     */
     @FXML
     private void OnReadyButton(ActionEvent event) throws IOException {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
         GameUtils.ChangeScene(stage, FxmlType.GameScene, "Scène de jeu");
     }
+
+    /**
+     * Fonction liée au bouton de redémarrage de partie présent sur la scène
+     * @param event Evenement de clique sur le bouton
+     */
     @FXML
     private void OnRestartButton(ActionEvent event) throws IOException {
         // On supprime les bateaux
@@ -334,49 +334,24 @@ public class BoatPlacement implements Initializable {
 
         GameUtils.ChangeScene(stage, FxmlType.BoatPlacement, "Placement des bateaux");
     }
+
+    /**
+     * Fonction liée au bouton d'aléatoire présent sur la scène
+     * @param event Evenement de clique sur le bouton
+     */
     @FXML
     private void OnRandomButton(ActionEvent event) {
         bataille.resetGrille();
-        bataille.RdmInitGrid(bataille.grilleJeu);
-
-        for (Bateau b: bataille.leftBateau) {
-            b.place(true);
-        }
+        bataille.rdmInitGrid(bataille.grilleJeu, bataille.leftBateau, parentBateau, root, UIGrille, false);
 
         nbPlacedBoat = bataille.leftBateau.size();
-
-        for (int x = 0; x < bataille.grilleJeu.length; x++) {
-            for (int y = 0; y < bataille.grilleJeu[x].length; y++) {
-                Pane pane = (Pane) UIGrille.getChildren().get(x * UIGrille.getColumnCount() + y);
-
-                if (bataille.grilleJeu[x][y] > 0) {
-                    pane.setBackground(new Background(new BackgroundFill(Color.rgb(255, 0, 0, 0.4), CornerRadii.EMPTY, Insets.EMPTY)));
-                } else {
-                    pane.setBackground(new Background(GameUtils.waterBackground));
-                }
-            }
-        }
 
         CheckAllBoatsPlace();
     }
 
-
     /**
-     * Fonction pour récupérer les contours d'une cellule
-     *
-     * @param event Event lors du drag and drop
-     * @return Retourne les contours de la cellule
+     * Fonction pour changer la rotation pour les prochains bateaux à poser
      */
-    private Bounds GetBounds(DragEvent event) {
-        Node source = event.getPickResult().getIntersectedNode();
-        Integer colIndex = GridPane.getColumnIndex(source);
-        Integer rowIndex = GridPane.getRowIndex(source);
-
-        if(colIndex == null || rowIndex == null) return null;
-
-        return UIGrille.getCellBounds(colIndex, rowIndex);
-    }
-
     @FXML
     private void DoRotation() {
         rotation = (rotation.getRotate() + 1) > 2 ? RotateType.VERTICAL : RotateType.HORIZONTAL;
@@ -388,14 +363,32 @@ public class BoatPlacement implements Initializable {
         }
     }
 
+    /**
+     * Fonction pour transformer une image que l'on sélectionne durant le drag and drop en bateau
+     * @param img Une image de bateau
+     * @return Une variable de type Bateau
+     *
+     * @see Bateau
+     */
     private Bateau ImageToBateau(ImageView img) {
         for(Bateau bateau : bataille.leftBateau) {
-            if(img == bateau.getImage())
+            if(img == bateau.getImage() || img == bateau.getLastImg())
             {
                 return bateau;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Fonction pour quitter, (Retour au menu principal)
+     * @throws IOException S'il y a un problème lors du chargement d'une scène
+     */
+    @FXML
+    private void Quitter() throws IOException {
+        Stage stage = (Stage) root.getScene().getWindow();
+
+        GameUtils.ChangeScene(stage, FxmlType.Lobby, "Menu Principal");
     }
 }
