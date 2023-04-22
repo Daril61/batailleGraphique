@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"com.example.bataillenavale_graphique","l":"com.example.bataillenavale_graphique"},{"m":"com.example.bataillenavale_graphique","l":"Utils"}];updateSearchResults();
